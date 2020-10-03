@@ -1,5 +1,7 @@
 package com.angelstoyanov.walkly;
 
+import android.util.Log;
+
 import io.flutter.embedding.android.FlutterActivity;
 
 import androidx.annotation.NonNull;
@@ -12,9 +14,12 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,10 +38,13 @@ public class MainActivity extends FlutterActivity {
                         final String last_name = call.argument("last_name");
                         final String email = call.argument("email");
                         final String password = call.argument("password");
-                        //Context context = call.argument("context");
 
                         registerUser(first_name,last_name,email,password);
                         result.success("1");
+                    }
+                    if (call.method.equals("getOffers")) {
+                        JSONObject jsonObject = getOffers();
+                        result.success(jsonObject);
                     }
 
                 });
@@ -45,29 +53,23 @@ public class MainActivity extends FlutterActivity {
 
     private void registerUser(final String first_name, final String last_name, final String email, final String password){
         final String URL_REGISTER = "http://192.168.1.9/walklyapp/register.php";
-        //SessionManager sessionManager = new SessionManager(context);
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_REGISTER, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                //Response goes here
-
-                //JSONObject jsonObject = new JSONObject(response);
-                //String success = jsonObject.getString("success");
                 String success = response;
 
                 if(success.equals("1")){
-                    //sessionManager.createSession();
+                    //TODO: Open a session if success
                 }
 
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError e) {
-                //Toast.makeText(RegisterActivity.this, "Registration failed (" + e.toString() + ")", Toast.LENGTH_SHORT).show();
+
             }
-        })
-        {
+        }) {
             @Override
             protected Map<String, String> getParams() {
                 Map<String,String> params = new HashMap<>();
@@ -83,4 +85,29 @@ public class MainActivity extends FlutterActivity {
         requestQueue.add(stringRequest);
 
     }
+
+    private JSONObject getOffers(){
+        final String url = "http://192.168.1.9/walklyapp/get_offers.php";
+        final JSONObject[] jsonObject = new JSONObject[1];
+        JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        jsonObject[0] = response;
+
+                        Log.d("Response", response.toString());
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        //Log.d("Error.Response", error.getMessage());
+                    }
+                }
+        );
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(getRequest);
+        return jsonObject[0];
+    }
+
 }
