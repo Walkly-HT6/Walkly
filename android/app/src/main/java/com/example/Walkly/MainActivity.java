@@ -81,6 +81,43 @@ public class MainActivity extends FlutterActivity {
                                 description, email, password, city, street_name, post_code, built_number);
                         result.success("1");
                     }
+                    
+                    if (call.method.equals("logIn")) {
+                        final String email = call.argument("email");
+                        final String password = call.argument("password");
+    
+                       final String url = "http://192.168.1.9/walklyapp/login.php";
+                        final String cookie = new String[1];
+                        cookie[1] = ""; //empty at start
+                       StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+
+                                if (response.lenght() == 20) { //The cookie is always 20 symbols
+                                    cookie[1] = response;
+                                    result.success(response);
+                                }
+
+                            }
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError e) {
+                                    result.error("0");
+                            }
+                        }) {
+                            @Override
+                            protected Map<String, String> getParams() {
+                                Map<String, String> params = new HashMap<>();
+                                params.put("email", email);
+                                params.put("password", password);
+                                params.put("cookie", cookie[1]);
+                                return params;
+                            }
+                        };
+
+                        RequestQueue requestQueue = Volley.newRequestQueue(this);
+                        requestQueue.add(stringRequest);
+                        
 
                 });
 
