@@ -39,19 +39,45 @@ public class MainActivity extends FlutterActivity {
                         final String email = call.argument("email");
                         final String password = call.argument("password");
 
-                        registerUser(first_name,last_name,email,password);
+                        registerUser(first_name, last_name, email, password);
                         result.success("1");
                     }
                     if (call.method.equals("getOffers")) {
                         JSONObject jsonObject = getOffers();
                         result.success(jsonObject);
                     }
+                    if (call.method.equals("makeOffer")) {
+                        //TODO: Fix
+                    }
+                    if (call.method.equals("registerDealer")) {
+                        final String company_name = call.argument("company_name");
+                        final int category_id = call.argument("category_id");
+                        final String business_hours = call.argument("business_hours");
+                        final String first_name = call.argument("first_name");
+                        final String last_name = call.argument("last_name");
+                        final String phone_number = call.argument("phone_number");
+                        final String description = call.argument("description");
+                        final String email = call.argument("email");
+                        final String password = call.argument("password");
+                        final String city = call.argument("city");
+                        final String street_name = call.argument("street_name");
+                        final String post_code = call.argument("post_code");
+                        final String built_number = call.argument("built_number");
+                        registerDealer(company_name,
+                                category_id,
+                                business_hours,
+                                first_name,
+                                last_name,
+                                phone_number,
+                                description, email, password, city, street_name, post_code, built_number);
+                        result.success("1");
+                    }
 
                 });
 
     }
 
-    private void registerUser(final String first_name, final String last_name, final String email, final String password){
+    private void registerUser(final String first_name, final String last_name, final String email, final String password) {
         final String URL_REGISTER = "http://192.168.1.9/walklyapp/register.php";
 
         StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_REGISTER, new Response.Listener<String>() {
@@ -59,7 +85,7 @@ public class MainActivity extends FlutterActivity {
             public void onResponse(String response) {
                 String success = response;
 
-                if(success.equals("1")){
+                if (success.equals("1")) {
                     //TODO: Open a session if success
                 }
 
@@ -72,11 +98,11 @@ public class MainActivity extends FlutterActivity {
         }) {
             @Override
             protected Map<String, String> getParams() {
-                Map<String,String> params = new HashMap<>();
-                params.put("first_name",first_name);
-                params.put("last_name",last_name);
-                params.put("email",email);
-                params.put("password",password);
+                Map<String, String> params = new HashMap<>();
+                params.put("first_name", first_name);
+                params.put("last_name", last_name);
+                params.put("email", email);
+                params.put("password", password);
                 return params;
             }
         };
@@ -86,7 +112,7 @@ public class MainActivity extends FlutterActivity {
 
     }
 
-    private JSONObject getOffers(){
+    private JSONObject getOffers() {
         final String url = "http://192.168.1.9/walklyapp/get_offers.php";
         final JSONObject[] jsonObject = new JSONObject[1];
         JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, url, null,
@@ -98,16 +124,105 @@ public class MainActivity extends FlutterActivity {
                         Log.d("Response", response.toString());
                     }
                 }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //Log.d("Error.Response", error.getMessage());
-                    }
-                }
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //Log.d("Error.Response", error.getMessage());
+            }
+        }
         );
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(getRequest);
         return jsonObject[0];
+    }
+
+    private void makeOffer(String description, float price) {
+        final String url = "http://192.168.1.9/walklyapp/make_offer.php";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                String success = response;
+
+                if (success.equals("1")) {
+                    //TODO: Success
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError e) {
+
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("description", description);
+                params.put("price", price + "");
+                return params;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }
+
+    private void registerDealer(final String company_name,
+                                final int category_id,
+                                final String business_hours,
+                                final String first_name,
+                                final String last_name,
+                                final String phone_number,
+                                final String description,
+                                final String email,
+                                final String password,
+                                final String city,
+                                final String street_name,
+                                final String post_code,
+                                final String built_number) {
+
+        final String url = "http://192.168.1.9/walklyapp/register_dealer.php";
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                String success = response;
+
+                if (success.equals("1")) {
+                    //TODO: Open a session if success
+                }
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError e) {
+
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("company_name", company_name);
+                params.put("business_hours", business_hours);
+                params.put("category_id", category_id + "");
+                params.put("first_name", first_name);
+                params.put("last_name", last_name);
+                params.put("phone_number", phone_number);
+                params.put("description", description);
+                params.put("password", password);
+                params.put("email", email);
+                params.put("city", city);
+                params.put("street_name", street_name);
+                params.put("post_code", post_code);
+                params.put("built_number", built_number);
+                return params;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+
+
     }
 
 }
