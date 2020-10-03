@@ -1,6 +1,8 @@
 package com.angelstoyanov.walkly;
 
+import android.content.Intent;
 import android.util.Log;
+import android.view.View;
 
 import io.flutter.embedding.android.FlutterActivity;
 
@@ -19,6 +21,8 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -47,7 +51,13 @@ public class MainActivity extends FlutterActivity {
                         result.success(jsonObject);
                     }
                     if (call.method.equals("makeOffer")) {
-                        //TODO: Fix
+                        final String date_from_to = call.argument("date_from_to");
+                        final int coupon_count = call.argument("coupon_count");
+                        final int business_user_id = call.argument("business_user_id");
+                        final String description = call.argument("description");
+                        final float price = call.argument("price");
+                        makeOffer(date_from_to,coupon_count,business_user_id,description,price);
+                        result.success("1");
                     }
                     if (call.method.equals("registerDealer")) {
                         final String company_name = call.argument("company_name");
@@ -136,7 +146,8 @@ public class MainActivity extends FlutterActivity {
         return jsonObject[0];
     }
 
-    private void makeOffer(String description, float price) {
+    private void makeOffer(final String date_from_to, final int coupon_count,
+                           final int business_user_id, final String description, final float price) {
         final String url = "http://192.168.1.9/walklyapp/make_offer.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
@@ -157,6 +168,9 @@ public class MainActivity extends FlutterActivity {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<>();
+                params.put("date_from_to", date_from_to);
+                params.put("coupon_count", coupon_count + "");
+                params.put("business_user_id", business_user_id + "");
                 params.put("description", description);
                 params.put("price", price + "");
                 return params;
@@ -221,7 +235,49 @@ public class MainActivity extends FlutterActivity {
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(stringRequest);
+    }
 
+    public void logIn(final String email, final String password){
+        final String url = "http://192.168.1.9/walklyapp/login.php";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            String success = jsonObject.getString("success");
+                            JSONArray jsonArray = jsonObject.getJSONArray("login");
+
+                            if(success.equals("1")){
+                                for(int i =0; i <jsonArray.length(); i++){
+                                    JSONObject object = jsonArray.getJSONObject(i);
+                                    //sessionManager.createSession(name,email);
+                                    //sessionManager.createSession();
+                                }
+                            }
+                        }catch (JSONException e){
+                            e.printStackTrace();
+                            //TODO: Add Toast for error login
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //TODO: Add Toast for error login ( response )
+            }
+        })
+        {
+            @Override
+            protected Map<String, String> getParams(){
+                Map<String, String> params = new HashMap<>();
+                params.put("email",email);
+                params.put("password",password);
+                return params;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
 
     }
 
