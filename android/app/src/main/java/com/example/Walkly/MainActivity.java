@@ -92,6 +92,7 @@ public class MainActivity extends FlutterActivity {
                     if(call.method.equals("logout")){
                         final String cookie = call.argument("cookie");
                         logOut(cookie);
+                        result.success("1");
 
                     }
                 });
@@ -143,7 +144,7 @@ public class MainActivity extends FlutterActivity {
                         public void onResponse(JSONObject response) {
                             jsonObject[0] = response;
 
-                            Log.d("Response", response.toString());
+                            //Log.d("Response", response.toString());
                         }
                     }, new Response.ErrorListener() {
                 @Override
@@ -317,7 +318,7 @@ public class MainActivity extends FlutterActivity {
 
             RequestQueue requestQueue = Volley.newRequestQueue(this);
             requestQueue.add(stringRequest);
-
+            Log.d("Cookie", cookie[0]);
             return cookie[0];
         }
 
