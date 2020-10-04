@@ -81,19 +81,19 @@ public class MainActivity extends FlutterActivity {
                                 description, email, password, city, street_name, post_code, built_number);
                         result.success("1");
                     }
-                    
+
                     if (call.method.equals("logIn")) {
                         final String email = call.argument("email");
                         final String password = call.argument("password");
-    
-                       final String url = "http://192.168.1.9/walklyapp/login.php";
-                        final String cookie = new String[1];
+
+                        final String url = "http://192.168.1.9/walklyapp/login.php";
+                        final String[] cookie = new String[1];
                         cookie[1] = ""; //empty at start
-                       StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
 
-                                if (response.lenght() == 20) { //The cookie is always 20 symbols
+                                if (response.length() == 20) { //The cookie is always 20 symbols
                                     cookie[1] = response;
                                     result.success(response);
                                 }
@@ -102,7 +102,7 @@ public class MainActivity extends FlutterActivity {
                         }, new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError e) {
-                                    result.error("0");
+                               // result.error("0");
                             }
                         }) {
                             @Override
@@ -117,208 +117,210 @@ public class MainActivity extends FlutterActivity {
 
                         RequestQueue requestQueue = Volley.newRequestQueue(this);
                         requestQueue.add(stringRequest);
-                        
 
+
+                    }
                 });
-
     }
 
-    private void registerUser(final String first_name, final String last_name, final String email, final String password) {
-        final String URL_REGISTER = "http://192.168.1.9/walklyapp/register.php";
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_REGISTER, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                String success = response;
 
-                if (success.equals("1")) {
-                    //TODO: Open a session if success
-                }
+        private void registerUser(final String first_name, final String last_name, final String email, final String password) {
+            final String URL_REGISTER = "http://192.168.1.9/walklyapp/register.php";
 
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError e) {
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_REGISTER, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    String success = response;
 
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("first_name", first_name);
-                params.put("last_name", last_name);
-                params.put("email", email);
-                params.put("password", password);
-                return params;
-            }
-        };
-
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(stringRequest);
-
-    }
-
-    private JSONObject getOffers() {
-        final String url = "http://192.168.1.9/walklyapp/get_offers.php";
-        final JSONObject[] jsonObject = new JSONObject[1];
-        JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        jsonObject[0] = response;
-
-                        Log.d("Response", response.toString());
+                    if (success.equals("1")) {
+                        //TODO: Open a session if success
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                //Log.d("Error.Response", error.getMessage());
-            }
+
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError e) {
+
+                }
+            }) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("first_name", first_name);
+                    params.put("last_name", last_name);
+                    params.put("email", email);
+                    params.put("password", password);
+                    return params;
+                }
+            };
+
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            requestQueue.add(stringRequest);
+
         }
-        );
 
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(getRequest);
-        return jsonObject[0];
-    }
+        private JSONObject getOffers() {
+            final String url = "http://192.168.1.9/walklyapp/get_offers.php";
+            final JSONObject[] jsonObject = new JSONObject[1];
+            JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            jsonObject[0] = response;
 
-    private void makeOffer(final String date_from_to, final int coupon_count,
-                           final int business_user_id, final String description, final float price) {
-        final String url = "http://192.168.1.9/walklyapp/make_offer.php";
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                String success = response;
-
-                if (success.equals("1")) {
-                    //TODO: Success
-                }
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError e) {
-
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("date_from_to", date_from_to);
-                params.put("coupon_count", coupon_count + "");
-                params.put("business_user_id", business_user_id + "");
-                params.put("description", description);
-                params.put("price", price + "");
-                return params;
-            }
-        };
-
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(stringRequest);
-    }
-
-    private void registerDealer(final String company_name,
-                                final int category_id,
-                                final String business_hours,
-                                final String first_name,
-                                final String last_name,
-                                final String phone_number,
-                                final String description,
-                                final String email,
-                                final String password,
-                                final String city,
-                                final String street_name,
-                                final String post_code,
-                                final String built_number) {
-
-        final String url = "http://192.168.1.9/walklyapp/register_dealer.php";
-
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                String success = response;
-
-                if (success.equals("1")) {
-                    //TODO: Open a session if success
-                }
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError e) {
-
-            }
-        }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("company_name", company_name);
-                params.put("business_hours", business_hours);
-                params.put("category_id", category_id + "");
-                params.put("first_name", first_name);
-                params.put("last_name", last_name);
-                params.put("phone_number", phone_number);
-                params.put("description", description);
-                params.put("password", password);
-                params.put("email", email);
-                params.put("city", city);
-                params.put("street_name", street_name);
-                params.put("post_code", post_code);
-                params.put("built_number", built_number);
-                return params;
-            }
-        };
-
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(stringRequest);
-    }
-
-    public void logIn(final String email, final String password){
-        final String url = "http://192.168.1.9/walklyapp/login.php";
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            JSONObject jsonObject = new JSONObject(response);
-                            String success = jsonObject.getString("success");
-                            JSONArray jsonArray = jsonObject.getJSONArray("login");
-
-                            if(success.equals("1")){
-                                for(int i =0; i <jsonArray.length(); i++){
-                                    JSONObject object = jsonArray.getJSONObject(i);
-                                    //sessionManager.createSession(name,email);
-                                    //sessionManager.createSession();
-                                }
-                            }
-                        }catch (JSONException e){
-                            e.printStackTrace();
-                            //TODO: Add Toast for error login
+                            Log.d("Response", response.toString());
                         }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    //Log.d("Error.Response", error.getMessage());
+                }
+            }
+            );
+
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            requestQueue.add(getRequest);
+            return jsonObject[0];
+        }
+
+        private void makeOffer(final String date_from_to, final int coupon_count,
+        final int business_user_id, final String description, final float price) {
+            final String url = "http://192.168.1.9/walklyapp/make_offer.php";
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    String success = response;
+
+                    if (success.equals("1")) {
+                        //TODO: Success
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                //TODO: Add Toast for error login ( response )
-            }
-        })
-        {
-            @Override
-            protected Map<String, String> getParams(){
-                Map<String, String> params = new HashMap<>();
-                params.put("email",email);
-                params.put("password",password);
-                return params;
-            }
-        };
 
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(stringRequest);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError e) {
+
+                }
+            }) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("date_from_to", date_from_to);
+                    params.put("coupon_count", coupon_count + "");
+                    params.put("business_user_id", business_user_id + "");
+                    params.put("description", description);
+                    params.put("price", price + "");
+                    return params;
+                }
+            };
+
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            requestQueue.add(stringRequest);
+        }
+
+        private void registerDealer(final String company_name,
+        final int category_id,
+        final String business_hours,
+        final String first_name,
+        final String last_name,
+        final String phone_number,
+        final String description,
+        final String email,
+        final String password,
+        final String city,
+        final String street_name,
+        final String post_code,
+        final String built_number) {
+
+            final String url = "http://192.168.1.9/walklyapp/register_dealer.php";
+
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    String success = response;
+
+                    if (success.equals("1")) {
+                        //TODO: Open a session if success
+                    }
+
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError e) {
+
+                }
+            }) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("company_name", company_name);
+                    params.put("business_hours", business_hours);
+                    params.put("category_id", category_id + "");
+                    params.put("first_name", first_name);
+                    params.put("last_name", last_name);
+                    params.put("phone_number", phone_number);
+                    params.put("description", description);
+                    params.put("password", password);
+                    params.put("email", email);
+                    params.put("city", city);
+                    params.put("street_name", street_name);
+                    params.put("post_code", post_code);
+                    params.put("built_number", built_number);
+                    return params;
+                }
+            };
+
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            requestQueue.add(stringRequest);
+        }
+
+        public void logIn(final String email, final String password){
+            final String url = "http://192.168.1.9/walklyapp/login.php";
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+                                String success = jsonObject.getString("success");
+                                JSONArray jsonArray = jsonObject.getJSONArray("login");
+
+                                if(success.equals("1")){
+                                    for(int i =0; i <jsonArray.length(); i++){
+                                        JSONObject object = jsonArray.getJSONObject(i);
+                                        //sessionManager.createSession(name,email);
+                                        //sessionManager.createSession();
+                                    }
+                                }
+                            }catch (JSONException e){
+                                e.printStackTrace();
+                                //TODO: Add Toast for error login
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    //TODO: Add Toast for error login ( response )
+                }
+            })
+            {
+                @Override
+                protected Map<String, String> getParams(){
+                    Map<String, String> params = new HashMap<>();
+                    params.put("email",email);
+                    params.put("password",password);
+                    return params;
+                }
+            };
+
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            requestQueue.add(stringRequest);
+
+        }
+
+        void logOut(){
+            //TODO: Make this one
+        }
 
     }
-
-    void logOut(){
-        //TODO: Make this one
-    }
-
-}
