@@ -24,6 +24,7 @@ public class MainActivity extends FlutterActivity {
     private String cookie_test = "";
     private String getOffers = "";
     private String couponCode = "";
+    private String userDetails = "";
 
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
@@ -98,6 +99,12 @@ public class MainActivity extends FlutterActivity {
 
                         {useOffer(email,cookie);}
                         result.success(couponCode);
+
+                    }
+                    if (call.method.equals("getUserDetails")) {
+                        final String email = call.argument("email");
+                        {getUserDetails(email);}
+                        result.success(userDetails);
 
                     }
                 });
@@ -291,7 +298,6 @@ public class MainActivity extends FlutterActivity {
                 public void onResponse(String response) {
                     if ( (response.length() + "").equals("20") ) { //The cookie is always 20 symbols
                         cookie_test = response;
-
                     }
 
                 }
@@ -372,5 +378,31 @@ public class MainActivity extends FlutterActivity {
             RequestQueue requestQueue = Volley.newRequestQueue(this);
             requestQueue.add(stringRequest);
         }
+    public void getUserDetails(final String email){
+        final String url = "http://192.168.1.9/walklyapp/use_offer.php";
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                userDetails = response;
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError e) {
+
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<>();
+                params.put("email", email);
+                //params.put("cookie", cookie);
+                return params;
+            }
+        };
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        requestQueue.add(stringRequest);
+    }
 
     }
