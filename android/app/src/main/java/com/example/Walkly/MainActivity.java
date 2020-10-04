@@ -26,7 +26,8 @@ import java.util.Map;
 public class MainActivity extends FlutterActivity {
     private static final String CHANNEL = "walkly/native";
     private String cookie_test = "";
-    JSONObject getOffers;
+    //JSONObject getOffers;
+    private String getOffers;
 
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
@@ -139,26 +140,22 @@ public class MainActivity extends FlutterActivity {
 
         private void getOffers() {
             final String url = "http://192.168.1.9/walklyapp/view_offers.php";
-            JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, url, null,
-                    new Response.Listener<JSONObject>() {
+            StringRequest getRequest = new StringRequest(Request.Method.GET, url,
+                    new Response.Listener<String>() {
                         @Override
-                        public void onResponse(JSONObject response) {
-                            //jsonObject[0] = response;
+                        public void onResponse(String response) {
                             getOffers = response;
 
-                            //Log.d("Response", response.toString());
                         }
                     }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    //Log.d("Error.Response", error.getMessage());
                 }
             }
             );
 
             RequestQueue requestQueue = Volley.newRequestQueue(this);
             requestQueue.add(getRequest);
-            //return jsonObject[0];
         }
 
         private void makeOffer(final String date_from_to, final String coupon_count,
@@ -290,8 +287,15 @@ public class MainActivity extends FlutterActivity {
             StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
+                    cookie_test = response;
+                    Log.d("RESPONSE: ", "TESTESTFefef"); //TESTESTFefef
+                    Log.d("RESPONSE: ", response.length() + ""); //20
+                    Log.d("RESPONSE: ", response); //randaof
+
                     if ( (response.length() + "").equals("20") ) { //The cookie is always 20 symbols
                         cookie_test = response;
+                        Log.d("TEST", "aseefffefef");
+                        Log.d("Cookie", "tetststst");
                     }
                     if(response.equals("Error")){
                     }
