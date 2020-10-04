@@ -1,8 +1,6 @@
 package com.angelstoyanov.walkly;
 
-import android.content.Intent;
 import android.util.Log;
-import android.view.View;
 
 import io.flutter.embedding.android.FlutterActivity;
 
@@ -94,8 +92,8 @@ public class MainActivity extends FlutterActivity {
                             public void onResponse(String response) {
 
                                 if (response.length() == 20) { //The cookie is always 20 symbols
-                                    cookie[1] = response;
-                                    result.success(response);
+                                    cookie[0] = response;
+                                    result.success(cookie[0]);
                                 }
 
                             }
@@ -110,7 +108,7 @@ public class MainActivity extends FlutterActivity {
                                 Map<String, String> params = new HashMap<>();
                                 params.put("email", email);
                                 params.put("password", password);
-                                params.put("cookie", cookie[1]);
+                                params.put("cookie", cookie[0]);
                                 return params;
                             }
                         };
@@ -118,6 +116,12 @@ public class MainActivity extends FlutterActivity {
                         RequestQueue requestQueue = Volley.newRequestQueue(this);
                         requestQueue.add(stringRequest);
 
+
+                    }
+
+                    if(call.method.equals("logout")){
+                        final String cookie = call.argument("cookie");
+                        logOut(cookie);
 
                     }
                 });
@@ -319,8 +323,37 @@ public class MainActivity extends FlutterActivity {
 
         }
 
-        void logOut(){
-            //TODO: Make this one
+        void logOut(final String cookie){
+            final String URL_REGISTER = "http://192.168.1.9/walklyapp/logout.php";
+
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_REGISTER, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    String success = response;
+
+                    if (success.equals("1")) {
+                        //If user is logged out
+                    }
+
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError e) {
+
+                }
+            }) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("cookie", cookie);
+                    return params;
+                }
+            };
+
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            requestQueue.add(stringRequest);
+
+
         }
 
     }
