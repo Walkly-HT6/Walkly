@@ -1,7 +1,5 @@
 package com.angelstoyanov.walkly;
 
-import android.util.Log;
-
 import io.flutter.embedding.android.FlutterActivity;
 
 import androidx.annotation.NonNull;
@@ -13,12 +11,10 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,8 +22,8 @@ import java.util.Map;
 public class MainActivity extends FlutterActivity {
     private static final String CHANNEL = "walkly/native";
     private String cookie_test = "";
-    //JSONObject getOffers;
-    private String getOffers;
+    private String getOffers = "";
+    private String couponCode = "";
 
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
@@ -45,7 +41,6 @@ public class MainActivity extends FlutterActivity {
                         result.success("1");
                     }
                     if (call.method.equals("getOffers")) {
-                        //JSONObject jsonObject = getOffers();
                         {getOffers();}
                         result.success(getOffers);
                     }
@@ -89,13 +84,20 @@ public class MainActivity extends FlutterActivity {
                         {logIn(email,password);}
                         result.success(cookie_test);
 
-//
                     }
 
                     if(call.method.equals("logout")){
                         final String cookie = call.argument("cookie");
                         logOut(cookie);
                         result.success("1");
+
+                    }
+                    if (call.method.equals("useOffer")) {
+                        final String email = call.argument("email");
+                        final String cookie = call.argument("cookie");
+
+                        {useOffer(email,cookie);}
+                        result.success(couponCode);
 
                     }
                 });
@@ -250,9 +252,9 @@ public class MainActivity extends FlutterActivity {
         }
 
         void logOut(final String cookie){
-            final String URL_REGISTER = "http://192.168.1.9/walklyapp/logout.php";
+            final String url = "http://192.168.1.9/walklyapp/logout.php";
 
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_REGISTER, new Response.Listener<String>() {
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     String success = response;
@@ -287,17 +289,9 @@ public class MainActivity extends FlutterActivity {
             StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    cookie_test = response;
-                    Log.d("RESPONSE: ", "TESTESTFefef"); //TESTESTFefef
-                    Log.d("RESPONSE: ", response.length() + ""); //20
-                    Log.d("RESPONSE: ", response); //randaof
-
                     if ( (response.length() + "").equals("20") ) { //The cookie is always 20 symbols
                         cookie_test = response;
-                        Log.d("TEST", "aseefffefef");
-                        Log.d("Cookie", "tetststst");
-                    }
-                    if(response.equals("Error")){
+
                     }
 
                 }
@@ -320,14 +314,43 @@ public class MainActivity extends FlutterActivity {
         }
 
         public void deleteUser(final String email, final String cookie){
-            final String URL_REGISTER = "http://192.168.1.9/walklyapp/delete_user.php";
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, URL_REGISTER, new Response.Listener<String>() {
+            final String url = "http://192.168.1.9/walklyapp/delete_user.php";
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     String success = response;
 
                     if (success.equals("1")) {
                         //If user is logged out
+                    }
+
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError e) {
+
+                }
+            }) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("email", email);
+                    params.put("cookie", cookie);
+                    return params;
+                }
+            };
+
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            requestQueue.add(stringRequest);
+        }
+        public void useOffer(final String email, final String cookie){
+            final String url = "http://192.168.1.9/walklyapp/use_offer.php";
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    if ( (response.length() + "").equals("6") ) { //The coupon code must always 6 symbols
+                        couponCode = response;
+
                     }
 
                 }
