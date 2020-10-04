@@ -18,8 +18,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -61,7 +59,7 @@ public class MainActivity extends FlutterActivity {
                     }
                     if (call.method.equals("registerDealer")) {
                         final String company_name = call.argument("company_name");
-                        final int category_id = call.argument("category_id");
+                        final String category_id = call.argument("category_id");
                         final String business_hours = call.argument("business_hours");
                         final String first_name = call.argument("first_name");
                         final String last_name = call.argument("last_name");
@@ -140,7 +138,7 @@ public class MainActivity extends FlutterActivity {
         }
 
         private void getOffers() {
-            final String url = "http://192.168.1.9/walklyapp/get_offers.php";
+            final String url = "http://192.168.1.9/walklyapp/view_offers.php";
             JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                     new Response.Listener<JSONObject>() {
                         @Override
@@ -199,7 +197,7 @@ public class MainActivity extends FlutterActivity {
         }
 
         private void registerDealer(final String company_name,
-        final int category_id,
+        final String category_id,
         final String business_hours,
         final String first_name,
         final String last_name,
@@ -235,7 +233,7 @@ public class MainActivity extends FlutterActivity {
                     Map<String, String> params = new HashMap<>();
                     params.put("company_name", company_name);
                     params.put("business_hours", business_hours);
-                    params.put("category_id", category_id + "");
+                    params.put("category_id", category_id);
                     params.put("first_name", first_name);
                     params.put("last_name", last_name);
                     params.put("phone_number", phone_number);
