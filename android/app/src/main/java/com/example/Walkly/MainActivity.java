@@ -83,43 +83,10 @@ public class MainActivity extends FlutterActivity {
                     if (call.method.equals("logIn")) {
                         final String email = call.argument("email");
                         final String password = call.argument("password");
+                        String cookie = logIn(email,password);
+                        result.success(cookie);
 
-                        final String url = "http://192.168.1.9/walklyapp/login.php";
-                        final String[] cookie = new String[1];
-                        cookie[0] = ""; //empty at start
-                        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String response) {
-
-                                if (response.length() == 20) { //The cookie is always 20 symbols
-                                    cookie[0] = response;
-                                    result.success(cookie[0]);
-                                }
-                                if(response.equals("Error")){
-                                    result.error("1","Error","-");
-                                }
-
-                            }
-                        }, new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError e) {
-                               // result.error("0");
-                            }
-                        }) {
-                            @Override
-                            protected Map<String, String> getParams() {
-                                Map<String, String> params = new HashMap<>();
-                                params.put("email", email);
-                                params.put("password", password);
-                                params.put("cookie", cookie[0]);
-                                return params;
-                            }
-                        };
-
-                        RequestQueue requestQueue = Volley.newRequestQueue(this);
-                        requestQueue.add(stringRequest);
-
-
+//
                     }
 
                     if(call.method.equals("logout")){
@@ -313,6 +280,45 @@ public class MainActivity extends FlutterActivity {
             requestQueue.add(stringRequest);
 
 
+        }
+
+        public String logIn(final String email, final String password){
+            final String url = "http://192.168.1.9/walklyapp/login.php";
+            final String[] cookie = new String[1];
+            cookie[0] = ""; //empty at start
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+
+                    if (response.length() == 20) { //The cookie is always 20 symbols
+                        cookie[0] = response;
+                        //result.success(cookie[0]);
+                    }
+                    if(response.equals("Error")){
+                        //result.error("1","Error","-");
+                    }
+
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError e) {
+                    // result.error("0");
+                }
+            }) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("email", email);
+                    params.put("password", password);
+                    params.put("cookie", cookie[0]);
+                    return params;
+                }
+            };
+
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            requestQueue.add(stringRequest);
+
+            return cookie[0];
         }
 
     }
