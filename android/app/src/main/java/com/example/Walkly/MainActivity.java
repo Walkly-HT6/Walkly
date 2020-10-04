@@ -282,50 +282,6 @@ public class MainActivity extends FlutterActivity {
             requestQueue.add(stringRequest);
         }
 
-        public void logIn(final String email, final String password){
-            final String url = "http://192.168.1.9/walklyapp/login.php";
-            StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            try {
-                                JSONObject jsonObject = new JSONObject(response);
-                                String success = jsonObject.getString("success");
-                                JSONArray jsonArray = jsonObject.getJSONArray("login");
-
-                                if(success.equals("1")){
-                                    for(int i =0; i <jsonArray.length(); i++){
-                                        JSONObject object = jsonArray.getJSONObject(i);
-                                        //sessionManager.createSession(name,email);
-                                        //sessionManager.createSession();
-                                    }
-                                }
-                            }catch (JSONException e){
-                                e.printStackTrace();
-                                //TODO: Add Toast for error login
-                            }
-                        }
-                    }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    //TODO: Add Toast for error login ( response )
-                }
-            })
-            {
-                @Override
-                protected Map<String, String> getParams(){
-                    Map<String, String> params = new HashMap<>();
-                    params.put("email",email);
-                    params.put("password",password);
-                    return params;
-                }
-            };
-
-            RequestQueue requestQueue = Volley.newRequestQueue(this);
-            requestQueue.add(stringRequest);
-
-        }
-
         void logOut(final String cookie){
             final String URL_REGISTER = "http://192.168.1.9/walklyapp/logout.php";
 
