@@ -27,6 +27,7 @@ import java.util.Map;
 
 public class MainActivity extends FlutterActivity {
     private static final String CHANNEL = "walkly/native";
+    private String cookie_test = "";
 
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
@@ -83,8 +84,9 @@ public class MainActivity extends FlutterActivity {
                     if (call.method.equals("logIn")) {
                         final String email = call.argument("email");
                         final String password = call.argument("password");
-                        String cookie = logIn(email,password);
-                        result.success(cookie);
+
+                        {logIn(email,password);}
+                        result.success(cookie_test);
 
 //
                     }
@@ -283,17 +285,20 @@ public class MainActivity extends FlutterActivity {
 
         }
 
-        public String logIn(final String email, final String password){
+        public void logIn(final String email, final String password){
             final String url = "http://192.168.1.9/walklyapp/login.php";
-            final String[] cookie = new String[1];
-            cookie[0] = ""; //empty at start
             StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
+                    cookie_test = response;
+                    Log.d("RESPONSE: ", "TESTESTFefef"); //TESTESTFefef
+                    Log.d("RESPONSE: ", response.length() + ""); //20
+                    Log.d("RESPONSE: ", response); //randaof
 
-                    if (response.length() == 20) { //The cookie is always 20 symbols
-                        cookie[0] = response;
-                        //result.success(cookie[0]);
+                    if ( (response.length() + "").equals("20") ) { //The cookie is always 20 symbols
+                        cookie_test = response;
+                        Log.d("TEST", "aseefffefef");
+                        Log.d("Cookie", "tetststst");
                     }
                     if(response.equals("Error")){
                         //result.error("1","Error","-");
@@ -311,15 +316,14 @@ public class MainActivity extends FlutterActivity {
                     Map<String, String> params = new HashMap<>();
                     params.put("email", email);
                     params.put("password", password);
-                    params.put("cookie", cookie[0]);
                     return params;
                 }
             };
 
             RequestQueue requestQueue = Volley.newRequestQueue(this);
             requestQueue.add(stringRequest);
-            Log.d("Cookie", cookie[0]);
-            return cookie[0];
+            //Log.d("Cookie", cookie[0]);
+            //return cookie[0];
         }
 
     }
