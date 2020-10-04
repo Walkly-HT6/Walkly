@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pedometer/pedometer.dart';
 import 'package:sensors/sensors.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starflut/starflut.dart';
 
 var apiCommunicator;
@@ -13,6 +14,7 @@ final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
 class Walker extends StatefulWidget {
   Walker({this.themeData});
+
   BetterThemeData themeData;
 
   @override
@@ -23,7 +25,7 @@ class _WalkerState extends State<Walker> {
   _WalkerState({this.themeData});
   String serverAddress;
   List<Widget> body = [];
-
+  bool nn = true;
   BetterThemeData themeData;
   Stream<StepCount> _stepCountStream;
   Stream<PedestrianStatus> _pedestrianStatusStream;
@@ -42,7 +44,7 @@ class _WalkerState extends State<Walker> {
   int timeInSecs = 0;
   //double avgUserAcc;
   List<List<double>> storeAccData = [];
-  bool nn = true;
+
   StarServiceClass Service;
   int prevSec = 0;
   int prevStepsCount = 0;
@@ -172,36 +174,48 @@ class _WalkerState extends State<Walker> {
     //await starcore.moduleExit();
   }
 
-  void startNN() async {
-    StarCoreFactory starcore = await Starflut.getFactory();
-    Service = await starcore.initSimple("test", "123", 0, 0, []);
-    await starcore.regMsgCallBackP(
-        (int serviceGroupID, int uMsg, Object wParam, Object lParam) async {
-      print("$serviceGroupID  $uMsg   $wParam   $lParam");
-      return null;
-    });
-    StarSrvGroupClass SrvGroup = await Service["_ServiceGroup"];
-
-    /*---script python--*/
-    bool isAndroid = await Starflut.isAndroid();
-    if (isAndroid == true) {
-      await Starflut.copyFileFromAssets(
-          "nnMove.py", "flutter_assets/starfiles", "flutter_assets/starfiles");
-      await Starflut.copyFileFromAssets("python3.6.zip",
-          "flutter_assets/starfiles", null); //desRelatePath must be null
-      await Starflut.copyFileFromAssets("zlib.cpython-36m.so", null, null);
-      await Starflut.copyFileFromAssets(
-          "unicodedata.cpython-36m.so", null, null);
-      await Starflut.loadLibrary("libpython3.6m.so");
+  @override
+  void dispose() {
+    super.dispose();
+    for (StreamSubscription<dynamic> subscription in _streamSubscriptions) {
+      subscription.cancel();
     }
+  }
 
-    String resPath = await Starflut.getResourcePath();
-    dynamic rr1 = await SrvGroup.initRaw("python36", Service);
-    var Result = await SrvGroup.loadRawModule("python", "",
-        resPath + "/flutter_assets/starfiles/" + "nnMove.py", false);
-    print("loadRawModule = $Result");
-    dynamic python = await Service.importRawContext("python", "", false, "");
-    print("python = " + await python.getString());
+  void startNN() async {
+    try {
+      StarCoreFactory starcore = await Starflut.getFactory();
+      Service = await starcore.initSimple("test", "123", 0, 0, []);
+      await starcore.regMsgCallBackP(
+          (int serviceGroupID, int uMsg, Object wParam, Object lParam) async {
+        print("$serviceGroupID  $uMsg   $wParam   $lParam");
+        return null;
+      });
+      StarSrvGroupClass SrvGroup = await Service["_ServiceGroup"];
+
+      /*---script python--*/
+      bool isAndroid = await Starflut.isAndroid();
+      if (isAndroid == true) {
+        await Starflut.copyFileFromAssets("nnMove.py",
+            "flutter_assets/starfiles", "flutter_assets/starfiles");
+        await Starflut.copyFileFromAssets("python3.6.zip",
+            "flutter_assets/starfiles", null); //desRelatePath must be null
+        await Starflut.copyFileFromAssets("zlib.cpython-36m.so", null, null);
+        await Starflut.copyFileFromAssets(
+            "unicodedata.cpython-36m.so", null, null);
+        await Starflut.loadLibrary("libpython3.6m.so");
+      }
+
+      String resPath = await Starflut.getResourcePath();
+      dynamic rr1 = await SrvGroup.initRaw("python36", Service);
+      var Result = await SrvGroup.loadRawModule("python", "",
+          resPath + "/flutter_assets/starfiles/" + "nnMove.py", false);
+      print("loadRawModule = $Result");
+      dynamic python = await Service.importRawContext("python", "", false, "");
+      print("python = " + await python.getString());
+    } on Error {
+      print('nn already running');
+    }
   }
 
   @override
@@ -239,7 +253,13 @@ class _WalkerState extends State<Walker> {
           FlatButton(
             child: Text("Exit"),
             onPressed: () {
-              Navigator.of(context).pop(netSteps);
+              SharedPreferences.getInstance().then((value) {
+                if (value.containsKey('points')) {
+                  int points = value.getInt('points');
+                  value.setInt('points', points + netSteps);
+                }
+              });
+              Navigator.of(context).pop();
             },
           )
         ],
@@ -253,10 +273,10 @@ class _WalkerState extends State<Walker> {
               style: TextStyle(fontSize: 25),
             ),
             Text(
-              'Pedestrian status:',
-              style: TextStyle(fontSize: 30),
+              'Steps taken WALKLY: ' + netSteps.toString(),
+              style: TextStyle(fontSize: 25),
             ),
-            Padding(
+            /*Padding(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
@@ -264,21 +284,7 @@ class _WalkerState extends State<Walker> {
                 ],
               ),
               padding: const EdgeInsets.all(16.0),
-            ),
-            Center(
-              child: Text(
-                _status,
-                style: _status == 'walking' || _status == 'stopped'
-                    ? TextStyle(fontSize: 30)
-                    : TextStyle(fontSize: 20, color: Colors.red),
-              ),
-            ),
-            FlatButton(
-              child: Text("TEST NeuNET"),
-              onPressed: () async {
-                //callNNMove(apiSteps, 10, avgUserAcc);
-              },
-            ),
+            ),*/
           ],
         ),
       ),

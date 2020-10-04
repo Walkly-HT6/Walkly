@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
@@ -17,9 +18,14 @@ final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
 class RecordDetails extends StatefulWidget {
   RecordDetails(
-      {this.serverAddress, this.cookie, this.selectedItem, this.themeData});
+      {this.serverAddress,
+      this.cookie,
+      this.selectedItem,
+      this.themeData,
+      this.email});
   String serverAddress;
   String cookie;
+  String email;
   Map selectedItem;
   Map<String, dynamic> tableData, tableProperties;
   String selectedTable = "index";
@@ -29,6 +35,7 @@ class RecordDetails extends StatefulWidget {
   _RecordDetailsState createState() => new _RecordDetailsState(
       serverAddress: this.serverAddress,
       cookie: this.cookie,
+      email: this.email,
       selectedItem: this.selectedItem,
       themeData: this.themeData);
 }
@@ -37,11 +44,13 @@ class _RecordDetailsState extends State<RecordDetails> {
   _RecordDetailsState(
       {this.serverAddress,
       this.cookie,
+      this.email,
       this.selectedItem,
       this.tableData,
       this.themeData});
   String serverAddress;
   String cookie;
+  String email;
   Map selectedItem;
   Map<String, dynamic> tableData, tableProperties;
   String selectedTable = "index";
@@ -56,23 +65,11 @@ class _RecordDetailsState extends State<RecordDetails> {
 
     apiCommunicator = apiCommunicator1(this.serverAddress);
     apiCommunicator.cookie = cookie;
-    FlutterDownloader.registerCallback(downloadCallback);
   }
 
   @override
   void dispose() {
     super.dispose();
-  }
-
-  static void downloadCallback(
-      String id, DownloadTaskStatus status, int progress) {
-    if (debug) {
-      print(
-          'Background Isolate Callback: task ($id) is in status ($status) and process ($progress)');
-    }
-    final SendPort send =
-        IsolateNameServer.lookupPortByName('downloader_send_port');
-    send.send([id, status, progress]);
   }
 
   Future<List<Widget>> prepare() async {
@@ -83,7 +80,7 @@ class _RecordDetailsState extends State<RecordDetails> {
     double screenWidth = size.width;
     List<Widget> recordDetails = [];
     recordDetails.add(Divider(height: screenHeight / 20));
-    recordDetails.add(Text(
+    /*recordDetails.add(Text(
       "Company name: ",
       style: TextStyle(fontSize: 16, color: themeData.textColor),
     ));
@@ -103,7 +100,8 @@ class _RecordDetailsState extends State<RecordDetails> {
     //var apiCommunicator = new apiCommunicator1(this.serverAddress);
     print(selectedItem);
     recordDetails.add(Text(
-        'this.selectedItem["business_user_id"][\'business_hours\']',
+        //'this.selectedItem["business_user_id"][\'business_hours\']',
+        'a',
         //showEditIcon: isSelected,
         style: TextStyle(
             fontWeight: FontWeight.bold,
@@ -122,7 +120,7 @@ class _RecordDetailsState extends State<RecordDetails> {
             fontWeight: FontWeight.bold,
             fontSize: 18,
             color: themeData.textColor)));
-
+*/
     //CREATE DETAILS
 
     List<Widget> currContainer = [];
@@ -154,19 +152,221 @@ class _RecordDetailsState extends State<RecordDetails> {
 
   @override
   Widget build(BuildContext context) {
-    prepare().then((value) {
-      body = value;
-    });
+    Size size = MediaQuery.of(context).size;
+    double screenHeight = size.height;
+    double screenWidth = size.width;
+
     return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: themeData.canvasColor,
-      appBar: AppBar(
-        backgroundColor: themeData.appBarColor,
-        title: const Text('View Row'),
-        actions: [],
-      ),
-      body: body[0],
-    );
+        key: _scaffoldKey,
+        backgroundColor: themeData.canvasColor,
+        appBar: AppBar(
+          backgroundColor: themeData.appBarColor,
+          title: const Text('Offer Info'),
+          actions: [],
+        ),
+        body: Container(
+            height: screenHeight,
+            width: screenWidth,
+            margin: EdgeInsets.all(10),
+            decoration: new BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: themeData.shadowColor.withOpacity(0.5),
+                  spreadRadius: 5,
+                  blurRadius: 7,
+                  offset: Offset(0, 3), // changes position of shadow
+                ),
+              ],
+              borderRadius: BorderRadius.all(Radius.circular(3)),
+              color: themeData.firstLayerBoxColor,
+            ),
+            padding: const EdgeInsets.fromLTRB(40, 10, 50, 40),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Divider(
+                    height: screenHeight / 20,
+                    color: themeData.firstLayerBoxColor,
+                  ),
+                  Text(
+                    "Dealer info",
+                    style: TextStyle(
+                        fontSize: 20,
+                        color: themeData.textColor,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  Divider(
+                    height: screenHeight / 20,
+                    thickness: 3,
+                    color: themeData.canvasColor,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Company name: ",
+                            style: TextStyle(
+                                fontSize: 16, color: themeData.textColor),
+                          ),
+                          Text(
+                              this
+                                  .selectedItem['business_user_details']
+                                      ['company_name']
+                                  .toString(),
+                              //showEditIcon: isSelected,
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                  color: themeData.textColor)),
+                        ],
+                      ),
+                      Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Working hours: ",
+                              style: TextStyle(
+                                  fontSize: 16, color: themeData.textColor),
+                            ),
+                            Text(
+                                this
+                                    .selectedItem["business_user_details"]
+                                        ['business_hours']
+                                    .toString(),
+                                //showEditIcon: isSelected,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                    color: themeData.textColor)),
+                          ]),
+                    ],
+                  ),
+                  Divider(
+                    height: screenHeight / 20,
+                    color: themeData.firstLayerBoxColor,
+                  ),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Contact: ",
+                                style: TextStyle(
+                                    fontSize: 16, color: themeData.textColor),
+                              ),
+                              Text(
+                                  this
+                                      .selectedItem["business_user_details"]
+                                          ['phone_number']
+                                      .toString(),
+                                  //showEditIcon: isSelected,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                      color: themeData.textColor)),
+                            ]),
+                        Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Company",
+                                style: TextStyle(
+                                    fontSize: 16, color: themeData.textColor),
+                              ),
+                              Text(
+                                "description: ",
+                                style: TextStyle(
+                                    fontSize: 16, color: themeData.textColor),
+                              ),
+                              Text(
+                                  this
+                                      .selectedItem["business_user_details"]
+                                          ['description']
+                                      .toString(),
+                                  //showEditIcon: isSelected,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                      color: themeData.textColor)),
+                            ])
+                      ]),
+                  Divider(
+                    height: screenHeight / 20,
+                    color: themeData.firstLayerBoxColor,
+                  ),
+                  Text(
+                    "Offer info",
+                    style: TextStyle(
+                        fontSize: 20,
+                        color: themeData.textColor,
+                        fontWeight: FontWeight.bold),
+                  ),
+                  Divider(
+                    height: screenHeight / 20,
+                    thickness: 3,
+                    color: themeData.canvasColor,
+                  ),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Description: ",
+                                style: TextStyle(
+                                    fontSize: 16, color: themeData.textColor),
+                              ),
+                              Text(this.selectedItem["description"].toString(),
+                                  //showEditIcon: isSelected,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                      color: themeData.textColor)),
+                            ]),
+                        Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Price",
+                                style: TextStyle(
+                                    fontSize: 16, color: themeData.textColor),
+                              ),
+                              Text(this.selectedItem["points"].toString(),
+                                  //showEditIcon: isSelected,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                      color: themeData.textColor)),
+                            ]),
+                      ]),
+                  Divider(
+                    height: screenHeight / 10,
+                    color: themeData.firstLayerBoxColor,
+                  ),
+                  Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    FlatButton(
+                      child: Text("BUY"),
+                      color: themeData.secondaryLayerBoxColor,
+                      onPressed: () async {
+                        print(cookie);
+                        var apiCommunicator =
+                            new apiCommunicator1(serverAddress);
+                        print(jsonEncode(await apiCommunicator.useOffer(email,
+                            cookie, this.selectedItem['id'].toString())));
+                      },
+                    )
+                  ])
+                ])));
   }
 
   Widget _buildListSection(String title) => Container(

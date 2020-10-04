@@ -11,7 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:starflut/starflut.dart';
 
 import 'dart:io' show File;
-import 'dart:convert' show json;
+import 'dart:convert' show json, jsonDecode;
 
 List<Widget> navigationMenu = [];
 List<Widget> userAccount = [];
@@ -55,6 +55,7 @@ class _LoginPageState extends State<MyApp> with SingleTickerProviderStateMixin {
         //value.remove(element);
       });
     });
+    SharedPreferences.getInstance().then((value) {});
     status = setTheme();
   }
 
@@ -241,22 +242,48 @@ class _LoginPageState extends State<MyApp> with SingleTickerProviderStateMixin {
                                                           passwordKey.text)
                                                       .then(
                                                           (String value) async {
-                                                    await Navigator.of(context)
-                                                        .push(MaterialPageRoute(
-                                                            builder: (BuildContext
-                                                                    context) =>
-                                                                MenuDashboard(
+                                                    if (value.length == 20) {
+                                                      dynamic userDetails =
+                                                          await apiCommunicator
+                                                              .getAccountDetails(
+                                                                  emailKey
+                                                                      .text);
+                                                      while (
+                                                          userDetails.length <
+                                                              1) {
+                                                        userDetails =
+                                                            await apiCommunicator
+                                                                .getAccountDetails(
+                                                                    emailKey
+                                                                        .text);
+                                                      }
+                                                      userDetails = jsonDecode(
+                                                          userDetails);
+                                                      String accountType;
+                                                      if (userDetails[
+                                                              "is_business"] ==
+                                                          "true") {
+                                                        accountType = 'dealer';
+                                                      } else {
+                                                        accountType = 'user';
+                                                      }
+                                                      await Navigator.of(context).push(MaterialPageRoute(
+                                                          builder: (BuildContext
+                                                                  context) =>
+                                                              MenuDashboard(
                                                                   value,
                                                                   "192.168.1.9",
-                                                                  "Ivan Ivanov",
+                                                                  userDetails[
+                                                                          "first_name"] +
+                                                                      " " +
+                                                                      userDetails[
+                                                                          "last_name"],
                                                                   context,
                                                                   platform,
                                                                   themeData,
-                                                                  'user',
-                                                                )));
-                                                    if (value == 20) {
-                                                      apiCommunicator
-                                                          .getAccountDetails();
+                                                                  accountType,
+                                                                  emailKey
+                                                                      .text)));
                                                       print(value);
                                                     } else {
                                                       _scaffoldKey.currentState
@@ -297,7 +324,7 @@ class _LoginPageState extends State<MyApp> with SingleTickerProviderStateMixin {
                                       ],
                                     ),
                                   ),
-                                  FlatButton(
+                                  /*FlatButton(
                                     child: Text("makeOffer"),
                                     onPressed: () async {
                                       var apiCommunicator =
@@ -307,21 +334,17 @@ class _LoginPageState extends State<MyApp> with SingleTickerProviderStateMixin {
                                               "today", 2, 2, "free fries", 3);
                                       print(result);
                                     },
-                                  ),
-                                  FlatButton(
-                                    child: Text("Test login"),
+                                  ),*/
+                                  /*FlatButton(
+                                    child: Text("details"),
                                     onPressed: () async {
                                       var apiCommunicator =
                                           new apiCommunicator1("alabala");
-
-                                      String cookie =
-                                          await apiCommunicator.login(
-                                        'den@bat',
-                                        'deni',
-                                      );
-                                      print(cookie);
+                                      String result = await apiCommunicator
+                                          .getAccountDetails("den@bat");
+                                      print(result);
                                     },
-                                  ),
+                                  )*/
                                 ])))))
               ]));
         } else {

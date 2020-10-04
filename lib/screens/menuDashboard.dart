@@ -32,8 +32,9 @@ class MenuDashboard extends StatefulWidget {
   final platform;
   BetterThemeData themeData;
   String accountType;
+  String email;
   MenuDashboard(this.cookie, this.serverAddress, this.name, this.myContext,
-      this.platform, this.themeData, this.accountType);
+      this.platform, this.themeData, this.accountType, this.email);
   @override
   _MenuDashboardPageState createState() => _MenuDashboardPageState(
       this.cookie,
@@ -42,29 +43,31 @@ class MenuDashboard extends StatefulWidget {
       this.myContext,
       this.platform,
       this.themeData,
-      this.accountType);
+      this.accountType,
+      this.email);
 }
 
 class _MenuDashboardPageState extends State<MenuDashboard>
     with SingleTickerProviderStateMixin {
-  _MenuDashboardPageState(this.cookie, this.serverAddress, this.name,
-      this.context, this.platform, this.themeData, this.accountType);
+  _MenuDashboardPageState(
+      this.cookie,
+      this.serverAddress,
+      this.name,
+      this.context,
+      this.platform,
+      this.themeData,
+      this.accountType,
+      this.email);
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   //MUST
   BetterThemeData themeData;
   String cookie;
   String serverAddress;
   String name;
-  List jsonMenu = ['test'];
   BuildContext context;
   String accountType;
-  //final flutterWebViewPlugin = FlutterWebviewPlugin();
+  String email;
   final platform;
-
-  bool _isLoading;
-  bool _permissionReady;
-  String _localPath;
-  ReceivePort _port = ReceivePort();
   Widget themeIcon;
   int points = 0;
   //MENU ANIMATION
@@ -78,13 +81,9 @@ class _MenuDashboardPageState extends State<MenuDashboard>
 
   String selectedTable = "index";
 
-  String tableScreenName = "dsd";
-  List<Marker> allMarkers = [];
+  String tableScreenName = "a";
 
-  GoogleMapController _mapscontroller;
   //DATATABLE
-  List<DataRow> _rowList = [];
-  List<DataColumn> _tableTemplate = [];
 
   List<Widget> gridItemList = [];
 
@@ -98,7 +97,7 @@ class _MenuDashboardPageState extends State<MenuDashboard>
   int recordsPerLoad = 20;
   int currentPageRowCount;
   List<Slide> slides = new List();
-
+  Map userData;
   @override
   void initState() {
     super.initState();
@@ -115,83 +114,17 @@ class _MenuDashboardPageState extends State<MenuDashboard>
       if (value.containsKey('points')) {
         points = value.getInt('points');
       } else {
-        points = 0;
+        this.points = 0;
         value.setInt('points', 0);
       }
     });
     setTheme();
-    _isLoading = true;
-    _permissionReady = false;
   }
 
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
-  }
-
-  void buildTabletemplate() {
-    _tableTemplate = [];
-    for (int i = 0; i < this.tableProperties['data'].length; i++) {
-      //print(this.tableProperties['data'][i]['fCaption']);
-      _tableTemplate.add(DataColumn(
-          label: GestureDetector(
-              child: Row(children: [
-                Text(this.tableProperties['data'][i]['fCaption']),
-                //Icon(Icons.search, color: Colors.grey[700])
-              ]),
-              onTap: () {
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text("Филтрирай по " +
-                          this.tableProperties['data'][i]['fCaption']),
-                      content: Stack(children: [
-                        TextField(
-                          controller: filterKey,
-                          decoration: InputDecoration(
-                            hintText: this.tableProperties['data'][i]
-                                ['fCaption'],
-                          ),
-                        )
-                      ]),
-                      actions: <Widget>[
-                        MaterialButton(
-                          onPressed: () async {
-                            //this.buttonColors = Colors.lightBlue[100];
-                            //this.selectedItem = {};
-                            this.tableData = await apiCommunicator
-                                .filterTableByField(
-                                    this.selectedTable,
-                                    this.tableProperties['data'][i]
-                                        ['NameField'],
-                                    filterKey.text)
-                                .then((Map<String, dynamic> value) {
-                              setState(() {
-                                build(context);
-                              });
-                            });
-                            setState(() {
-                              build(context);
-                            });
-
-                            Navigator.of(context).pop();
-                          },
-                          child: Text("GO"),
-                        ),
-                        MaterialButton(
-                          onPressed: () async {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text("CANCEL"),
-                        )
-                      ],
-                    );
-                  },
-                );
-              })));
-    }
   }
 
   Future<int> setTheme() async {
@@ -307,11 +240,13 @@ class _MenuDashboardPageState extends State<MenuDashboard>
               this.selectedItem = {};
               this.filterKey.clear();
               this.currentPage = 1;
-
-              Map<String, dynamic> tableInfoLocal;
-              print("1");
-              apiCommunicator.cookie = cookie;
-              print("1");
+              var apiCommunicator = new apiCommunicator1(this.serverAddress);
+              String answer =
+                  await apiCommunicator.getAccountDetails(this.email);
+              while (answer.length < 1) {
+                answer = await apiCommunicator.getOffers();
+              }
+              userData = jsonDecode(answer);
               setState(() {
                 if (isCollapsed != true) {
                   isCollapsed = !isCollapsed;
@@ -344,8 +279,11 @@ class _MenuDashboardPageState extends State<MenuDashboard>
                 this.currentPage = 1;
 
                 var apiCommunicator = new apiCommunicator1(this.serverAddress);
-
-                this.tableData = jsonDecode(await apiCommunicator.getOffers());
+                String answer = await apiCommunicator.getOffers();
+                while (answer.length < 1) {
+                  answer = await apiCommunicator.getOffers();
+                }
+                this.tableData = jsonDecode(answer);
                 build(context);
                 print("1");
                 setState(() {
@@ -433,28 +371,19 @@ class _MenuDashboardPageState extends State<MenuDashboard>
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.w400))),
-          onPressed: () {},
+          onPressed: () {
+            cookie = "";
+            Navigator.of(context).pop();
+          },
         )));
   }
 
+//FOR MENU
   void getAccountDetails(String name, context) {
     Size size = MediaQuery.of(context).size;
     var screenHeight = size.height;
     var screenWidth = size.width;
     userAccount = [];
-    /*userAccount.add(Container(
-      height: 72,
-      alignment: Alignment.bottomLeft,
-      child: Icon(
-        Icons.account_circle,
-        color: Colors.white,
-        size: 24.0,
-      )));
-  userAccount.add(Container(
-      height: 75,
-      alignment: Alignment.bottomLeft,
-      child: Text(" " + name,
-          style: TextStyle(color: Colors.white, fontSize: 22))));*/
     userAccount.add(Container(
         height: screenHeight / 6.1,
         alignment: Alignment.bottomLeft,
@@ -474,7 +403,6 @@ class _MenuDashboardPageState extends State<MenuDashboard>
         alignment: Alignment.bottomLeft,
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            //mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(" " + name.split(" ")[0],
@@ -489,6 +417,11 @@ class _MenuDashboardPageState extends State<MenuDashboard>
     print("rebuilding..");
     fillMenu(this.context);
     getAccountDetails(name, this.context);
+    SharedPreferences.getInstance().then((value) {
+      if (value.containsKey('points')) {
+        this.points = value.getInt('points');
+      }
+    });
     Size size = MediaQuery.of(this.context).size;
     screenHeight = size.height;
     screenWidth = size.width;
@@ -543,7 +476,6 @@ class _MenuDashboardPageState extends State<MenuDashboard>
     print("Updating datatable");
     //_addGrid();
     //_addRow();
-    buildTabletemplate();
     Widget dataSpot;
     if (this.gridItemList.length > 0) {
       dataSpot = ListView(
@@ -751,7 +683,7 @@ class _MenuDashboardPageState extends State<MenuDashboard>
                                               color: themeData.canvasColor,
                                             ),
                                             Text(
-                                              "Welcome, Denis Zahariev",
+                                              "Welcome, " + name,
                                               style: TextStyle(
                                                   fontSize: 20,
                                                   color: themeData.textColor),
@@ -836,14 +768,14 @@ class _MenuDashboardPageState extends State<MenuDashboard>
                                             FlatButton(
                                               child: Text("Start counting"),
                                               onPressed: () async {
-                                                var answer = await Navigator.of(
-                                                        context)
-                                                    .push(MaterialPageRoute(
-                                                        builder: (BuildContext
-                                                                context) =>
-                                                            Walker(
-                                                                themeData:
-                                                                    themeData)));
+                                                await Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Walker(
+                                                              themeData:
+                                                                  themeData)),
+                                                );
                                               },
                                             )
                                           ],
@@ -1031,7 +963,7 @@ class _MenuDashboardPageState extends State<MenuDashboard>
                                               color: themeData.canvasColor,
                                             ),
                                             Text(
-                                              "Welcome, Denis Zahariev",
+                                              "Welcome, " + name,
                                               style: TextStyle(
                                                   fontSize: 20,
                                                   color: themeData.textColor),
@@ -1216,7 +1148,79 @@ class _MenuDashboardPageState extends State<MenuDashboard>
                   ))));
       //}
 
+    } else if (this.selectedTable == "account") {
+      return AnimatedPositioned(
+          duration: duration,
+          top: 0,
+          bottom: 0,
+          left: isCollapsed ? 0 : 0.6 * screenWidth,
+          right: isCollapsed ? 0 : -0.2 * screenWidth,
+          child: ScaleTransition(
+              scale: _scaleAnimation,
+              child: Material(
+                  animationDuration: duration,
+                  borderRadius: BorderRadius.all(Radius.circular(3)),
+                  elevation: 8,
+                  color: themeData.canvasColor,
+                  child: Column(
+                    children: [
+                      Container(
+                          padding: const EdgeInsets.only(
+                              left: 16, right: 16, top: 48),
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                //APPBAR
+                                Container(
+                                    child: Row(
+                                  //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    InkWell(
+                                      child: Icon(Icons.menu,
+                                          color: Colors.lightBlue),
+                                      onTap: () {
+                                        FocusScope.of(context).unfocus();
+                                        setState(() {
+                                          if (isCollapsed)
+                                            _controller.forward();
+                                          else
+                                            _controller.reverse();
+
+                                          isCollapsed = !isCollapsed;
+                                        });
+                                      },
+                                    ),
+                                    Text(this.tableScreenName,
+                                        style: TextStyle(
+                                            fontSize: 24,
+                                            color: themeData.textColor)),
+
+                                    //Icon(Icons.settings, color: Colors.white),
+                                  ],
+                                )),
+                                Divider(
+                                  color: Colors.lightBlue, //Color(0xFF333333),
+                                  height: screenHeight / 370 * 4,
+                                  thickness: screenHeight / 370,
+                                  indent: 3,
+                                  endIndent: 3,
+                                ),
+                                Divider(
+                                  color: themeData
+                                      .canvasColor, //Color(0xFF333333),
+                                  height: screenHeight / 370 * 6,
+                                  thickness: screenHeight / 370,
+                                  indent: 3,
+                                  endIndent: 3,
+                                ),
+                              ])),
+                      accountPageBuild(context)
+                      //datagridPageBuild(context)
+                    ],
+                  ))));
     }
+    //}
   }
 
   void _addGrid() {
@@ -1232,7 +1236,7 @@ class _MenuDashboardPageState extends State<MenuDashboard>
         currRow.add(
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(
-            "Описание: ",
+            "Offer description: ",
             style: TextStyle(fontSize: 16, color: themeData.textColor),
           ),
           Text(this.tableData['Offer #' + (i).toString()]["description"],
@@ -1245,7 +1249,7 @@ class _MenuDashboardPageState extends State<MenuDashboard>
         currRow.add(
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(
-            "Срок на отстъпката: ",
+            "Validity period: ",
             style: TextStyle(fontSize: 16, color: themeData.textColor),
           ),
           Text(this.tableData['Offer #' + (i).toString()]["date_from_to"],
@@ -1258,7 +1262,7 @@ class _MenuDashboardPageState extends State<MenuDashboard>
         currRow.add(
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(
-            "Цена: ",
+            "Price: ",
             style: TextStyle(fontSize: 16, color: themeData.textColor),
           ),
           Text(this.tableData['Offer #' + (i).toString()]["points"],
@@ -1298,10 +1302,12 @@ class _MenuDashboardPageState extends State<MenuDashboard>
             });
             print("details");
             print(selectedItem);
+            print(selectedItem);
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (BuildContext context) => RecordDetails(
                     serverAddress: this.serverAddress,
                     cookie: this.cookie,
+                    email: this.email,
                     selectedItem: this.selectedItem,
                     themeData: this.themeData)));
           }));
@@ -1543,6 +1549,318 @@ class _MenuDashboardPageState extends State<MenuDashboard>
           crossAxisAlignment: CrossAxisAlignment.end,
           children: pages),
     );
+  }
+
+  Widget accountPageBuild(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    var screenHeight = size.height;
+    var screenWidth = size.width;
+    apiCommunicator.cookie = apiCommunicator.cookie;
+    Widget dataSpot;
+    if (this.accountType == 'user') {
+      dataSpot = Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("First name:",
+                        style: TextStyle(
+                            color: themeData.textColor, fontSize: 18)),
+                    Text(
+                      this.userData['first_name'],
+                      style: TextStyle(
+                          color: themeData.textColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    )
+                  ]),
+              Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Last name:",
+                        style: TextStyle(
+                            color: themeData.textColor, fontSize: 18)),
+                    Text(
+                      this.userData['last_name'],
+                      style: TextStyle(
+                          color: themeData.textColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    )
+                  ]),
+            ],
+          ),
+          Divider(
+            height: 50,
+            color: themeData.canvasColor,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Email:",
+                        style: TextStyle(
+                            color: themeData.textColor, fontSize: 18)),
+                    Text(
+                      this.userData['email'],
+                      style: TextStyle(
+                          color: themeData.textColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    )
+                  ]),
+              Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Account type:",
+                        style: TextStyle(
+                            color: themeData.textColor, fontSize: 18)),
+                    Text(
+                      this.accountType,
+                      style: TextStyle(
+                          color: themeData.textColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    )
+                  ]),
+            ],
+          ),
+          Divider(
+            height: 50,
+            color: themeData.canvasColor,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Date joined:",
+                        style: TextStyle(
+                            color: themeData.textColor, fontSize: 18)),
+                    Text(
+                      this.userData['joined_date'].toString().substring(0, 10),
+                      style: TextStyle(
+                          color: themeData.textColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    )
+                  ]),
+            ],
+          ),
+          Divider(
+            height: 100,
+            color: themeData.canvasColor,
+          ),
+          FlatButton(
+              child: Text("DELETE ACCOUNT"),
+              color: Colors.red,
+              onPressed: () {
+                var apiCommunicator = new apiCommunicator1(serverAddress);
+                apiCommunicator.logout(cookie);
+                apiCommunicator.deleteProfile(email, cookie);
+                cookie = "";
+                Navigator.of(context).pop();
+              })
+        ],
+      );
+    } else {
+      /*id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+	company_name VARCHAR(100) NOT NULL,
+	category_id INT NOT NULL,	
+	business_hours VARCHAR(6) NOT NULL,
+	offers INT,
+	first_name VARCHAR(50) NOT NULL,
+	last_name VARCHAR(75) NOT NULL,
+	phone_number VARCHAR(20) NOT NULL,
+	description VARCHAR(300),
+	email VARCHAR(150) NOT NULL,
+	password VARCH*/
+      dataSpot = Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Company name:",
+                        style: TextStyle(
+                            color: themeData.textColor, fontSize: 18)),
+                    Text(
+                      this.userData['company_name'],
+                      style: TextStyle(
+                          color: themeData.textColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    )
+                  ]),
+              Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Working hours:",
+                        style: TextStyle(
+                            color: themeData.textColor, fontSize: 18)),
+                    Text(
+                      this.userData['business_hours'],
+                      style: TextStyle(
+                          color: themeData.textColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    )
+                  ]),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("First name:",
+                        style: TextStyle(
+                            color: themeData.textColor, fontSize: 18)),
+                    Text(
+                      this.userData['first_name'],
+                      style: TextStyle(
+                          color: themeData.textColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    )
+                  ]),
+              Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Last name:",
+                        style: TextStyle(
+                            color: themeData.textColor, fontSize: 18)),
+                    Text(
+                      this.userData['last_name'],
+                      style: TextStyle(
+                          color: themeData.textColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    )
+                  ]),
+            ],
+          ),
+          Divider(
+            height: 50,
+            color: themeData.canvasColor,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Email:",
+                        style: TextStyle(
+                            color: themeData.textColor, fontSize: 18)),
+                    Text(
+                      this.userData['email'],
+                      style: TextStyle(
+                          color: themeData.textColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    )
+                  ]),
+              Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Account type:",
+                        style: TextStyle(
+                            color: themeData.textColor, fontSize: 18)),
+                    Text(
+                      this.accountType,
+                      style: TextStyle(
+                          color: themeData.textColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    )
+                  ]),
+            ],
+          ),
+          Divider(
+            height: 50,
+            color: themeData.canvasColor,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Date joined:",
+                        style: TextStyle(
+                            color: themeData.textColor, fontSize: 18)),
+                    Text(
+                      this.userData['joined_date'].toString().substring(0, 10),
+                      style: TextStyle(
+                          color: themeData.textColor,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold),
+                    )
+                  ]),
+            ],
+          ),
+          Divider(
+            height: 100,
+            color: themeData.canvasColor,
+          ),
+          FlatButton(
+              child: Text("DELETE ACCOUNT"),
+              color: Colors.red,
+              onPressed: () {
+                var apiCommunicator = new apiCommunicator1(serverAddress);
+                apiCommunicator.logout(cookie);
+                apiCommunicator.deleteProfile(email, cookie);
+                cookie = "";
+                Navigator.of(context).pop();
+              })
+        ],
+      );
+    }
+
+    return Column(children: <Widget>[
+      Divider(
+        color: themeData.canvasColor, //Color(0xFF333333),
+        height: 10,
+        thickness: 0,
+        indent: null,
+        endIndent: 0,
+      ),
+      Divider(
+        color: Colors.lightBlue, //Color(0xFF333333),
+        height: 2,
+        thickness: 2,
+        indent: null,
+        endIndent: 0,
+      ),
+      Container(
+        padding: EdgeInsets.fromLTRB(20, 40, 20, 40),
+        key: _keyRed,
+        height: MediaQuery.of(context).size.height / 1.3679,
+        child: dataSpot,
+      ),
+    ]);
   }
 }
 

@@ -31,28 +31,23 @@ class apiCommunicator1 {
     return _message;
   }
 
-  Future<String> registerDealer(String name, String address, String bussiness_hours, String description, String password) async {
-    const platformMethodChannel = const MethodChannel('walkly/native');
-
-    String _message;
+  Future<String> logout(String cookie) async {
+    String _message = "error";
     try {
-      final String result =
-          await platformMethodChannel.invokeMethod('registerDealer', {
-        "name": name,
-        "address": address,
-        "bussiness_hours": bussiness_hours,
-        "description": description,
-        "password": password
-        });
+      final String result = await platformMethodChannel
+          .invokeMethod('logOut', {"cookie": cookie});
       _message = result;
     } on PlatformException catch (e) {
-      _message = "Unable to use native functions!";
+      _message = "Can't do native stuff ${e.message}.";
     }
+    print(_message);
+    cookie = _message;
     return _message;
   }
+
   Future<String> registerUser(String first_name, String last_name, String email,
       String password) async {
-    const platformMethodChannel = const MethodChannel('walkly/native');
+    //const platformMethodChannel = const MethodChannel('walkly/native');
 
     String _message;
     try {
@@ -61,33 +56,32 @@ class apiCommunicator1 {
         "first_name": first_name,
         "last_name": last_name,
         "email": email,
-<<<<<<< HEAD
         "password": password,
-=======
-        "password": password
->>>>>>> f2ccb755e778709fb208f71521c0d590c625fc13
       });
       _message = result;
     } on PlatformException catch (e) {
       _message = "Unable to use native functions!";
     }
-<<<<<<< HEAD
     print(_message);
-=======
->>>>>>> f2ccb755e778709fb208f71521c0d590c625fc13
     return _message;
   }
 
-  Future<int> deleteProfile(String email) async {
-    String url = this.serverAddress + 'deleteProfile';
-    var response = await http.post(Uri.parse(url), body: {'set-cookie': this.cookie});
-    return jsonDecode(response.body);
+  Future<String> deleteProfile(String email, String cookie) async {
+    String _message = "error";
+    try {
+      final String result = await platformMethodChannel
+          .invokeMethod('deleteUser', {"email": email, "cookie": cookie});
+      _message = result;
+    } on PlatformException catch (e) {
+      _message = "Can't do native stuff ${e.message}.";
+    }
+    cookie = _message;
+    return _message;
   }
-<<<<<<< HEAD
 
   Future<String> registerDealer(
       String company_name,
-      int category_id,
+      String category_id,
       String bussiness_hours,
       String first_name,
       String last_name,
@@ -102,6 +96,7 @@ class apiCommunicator1 {
     const platformMethodChannel = const MethodChannel('walkly/native');
 
     String _message;
+    print(category_id);
     try {
       final String result =
           await platformMethodChannel.invokeMethod('registerDealer', {
@@ -140,32 +135,40 @@ class apiCommunicator1 {
     return _message;
   }
 
-  Future<String> getAccountDetails() async {
+  Future<String> getAccountDetails(String email) async {
     const platformMethodChannel = const MethodChannel('walkly/native');
-
+    print('in');
     dynamic _message;
     try {
-      final dynamic result =
-          await platformMethodChannel.invokeMethod('details_user');
+      final dynamic result = await platformMethodChannel
+          .invokeMethod('getUserDetails', {'email': email});
       _message = result;
+
+      print(_message);
     } on PlatformException catch (e) {
       _message = "Unable to use native functions!";
     }
     return _message;
   }
 
-  Future<Map> useOffer() async {
+  /*Future<String> useOffer(String email, String cookie, String id) async {
     const platformMethodChannel = const MethodChannel('walkly/native');
-
+    print(id);
     dynamic _message;
     try {
-      final dynamic result =
-          await platformMethodChannel.invokeMethod('getOffers');
+      final dynamic result = await platformMethodChannel.invokeMethod(
+          'useOffer', {'email': email, 'cookie': cookie, 'id': id.toString()});
       _message = result;
     } on PlatformException catch (e) {
       _message = "Unable to use native functions!";
     }
     return _message;
+  }*/
+  Future<String> useOffer(String email, String cookie, String id) async {
+    http.Response result = await http.post(
+        Uri.parse('http://192.168.1.9/walklyapp/use_offer.php'),
+        body: {'cookie': cookie, 'email': email, 'offer_id': id});
+    print(result.reasonPhrase);
   }
 
   Future<String> makeOffer(String date_from_to, int coupon_count,
@@ -188,38 +191,5 @@ class apiCommunicator1 {
       _message = "Unable to use native functions!";
     }
     return _message;
-=======
-  Future<Map> getOffers() async {
-    String url = this.serverAddress + 'getOffers';
-    var response = await http.get(Uri.parse(url), body: {'set-cookie': this.cookie});
-    return jsonDecode(response.body);
-  }
-  Future<Map> useOffer(int id) async {
-    String url = this.serverAddress + 'useOffer';
-    var response = await http.post(Uri.parse(url), body: {'set-cookie': this.cookie,
-    'offerID': id});
-    return jsonDecode(response.body);
-  }
-  Future<Map> makeOffer({int categoryID, String firmName, String describtion,
-   String address, String price, int unitsPerOffer, String bussinessHours, String dateFromToDateDue}) async {
-    String url = this.serverAddress + 'makeOffer';
-    var response = await http.post(Uri.parse(url), body: {'set-cookie': this.cookie,
-    "categoryID": categoryID,
-    "firmName": firmName,
-    "describtion": describtion,
-    "address": address,
-    "price": price,
-    "unitsPerOffer": unitsPerOffer,
-    "bussinessHours": bussinessHours,
-    "dateFromToDateDue": dateFromToDateDue:
-    });
-    return jsonDecode(response.body);
-  }
-  Future<Map> deleteOffer(int offerID) async {
-    String url = this.serverAddress + 'delteOffer';
-    var response = await http.post(Uri.parse(url), body: {'set-cookie': this.cookie,
-    "offerID": offerID});
-    return jsonDecode(response.body);
->>>>>>> f2ccb755e778709fb208f71521c0d590c625fc13
   }
 }

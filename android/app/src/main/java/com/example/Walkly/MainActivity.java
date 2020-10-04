@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-=======
-package com.angelstoyanov.walkly;
-
->>>>>>> f2ccb755e778709fb208f71521c0d590c625fc13
+package com.example.Walkly;
 import io.flutter.embedding.android.FlutterActivity;
 
 import androidx.annotation.NonNull;
@@ -99,8 +95,9 @@ public class MainActivity extends FlutterActivity {
                     if (call.method.equals("useOffer")) {
                         final String email = call.argument("email");
                         final String cookie = call.argument("cookie");
+                        final String offer_id = call.argument("id");
 
-                        {useOffer(email,cookie);}
+                        {useOffer(email,cookie,offer_id);}
                         result.success(couponCode);
 
                     }
@@ -352,11 +349,12 @@ public class MainActivity extends FlutterActivity {
             RequestQueue requestQueue = Volley.newRequestQueue(this);
             requestQueue.add(stringRequest);
         }
-        public void useOffer(final String email, final String cookie){
+        public void useOffer(final String email, final String cookie, final String offer_id){
             final String url = "http://192.168.1.9/walklyapp/use_offer.php";
             StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
+                    
                     if ( (response.length() + "").equals("6") ) { //The coupon code must always 6 symbols
                         couponCode = response;
 
@@ -374,6 +372,7 @@ public class MainActivity extends FlutterActivity {
                     Map<String, String> params = new HashMap<>();
                     params.put("email", email);
                     params.put("cookie", cookie);
+                    params.put("offer_id", offer_id);
                     return params;
                 }
             };
@@ -382,7 +381,7 @@ public class MainActivity extends FlutterActivity {
             requestQueue.add(stringRequest);
         }
     public void getUserDetails(final String email){
-        final String url = "http://192.168.1.9/walklyapp/use_offer.php";
+        final String url = "http://192.168.1.9/walklyapp/detail_user.php";
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -408,8 +407,4 @@ public class MainActivity extends FlutterActivity {
         requestQueue.add(stringRequest);
     }
 
-<<<<<<< HEAD
     }
-=======
-    }
->>>>>>> f2ccb755e778709fb208f71521c0d590c625fc13

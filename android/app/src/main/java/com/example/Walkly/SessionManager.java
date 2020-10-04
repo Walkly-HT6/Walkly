@@ -1,13 +1,7 @@
-<<<<<<< HEAD
 package com.example.Walkly;
 
 import android.content.Context;
 import android.content.Intent;
-=======
-package com.angelstoyanov.walkly;
-
-import android.content.Context;
->>>>>>> f2ccb755e778709fb208f71521c0d590c625fc13
 import android.content.SharedPreferences;
 
 import java.util.HashMap;
@@ -17,11 +11,8 @@ public class SessionManager {
     public SharedPreferences.Editor editor;
     public Context context;
 
-<<<<<<< HEAD
     int PRIVATE_MODE = 0;
 
-=======
->>>>>>> f2ccb755e778709fb208f71521c0d590c625fc13
     private static final String PREF_NAME = "LOGIN";
     private static final String LOGIN = "IS_LOGIN";
 
@@ -30,11 +21,7 @@ public class SessionManager {
 
     public SessionManager(Context context){
         this.context = context;
-<<<<<<< HEAD
         sharedPreferences = context.getSharedPreferences("Login",PRIVATE_MODE);
-=======
-        sharedPreferences = context.getSharedPreferences("Login",Context.MODE_PRIVATE);
->>>>>>> f2ccb755e778709fb208f71521c0d590c625fc13
         editor.apply(); //TIP: Comment this if doesn't work
         editor = sharedPreferences.edit();
     }

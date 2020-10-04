@@ -35,6 +35,8 @@ class _RegistrationState extends State<Registration> {
 
   //DEALER
   final dealerCompanyNameValidationKey = GlobalKey<FormState>();
+  final dealerCategoryValidationKey = GlobalKey<FormState>();
+
   final dealerBussinessHoursValidationKey = GlobalKey<FormState>();
   final dealerFirstNameValidationKey = GlobalKey<FormState>();
   final dealerLastNameValidationKey = GlobalKey<FormState>();
@@ -49,6 +51,7 @@ class _RegistrationState extends State<Registration> {
   final dealerBuiltNumberValidationKey = GlobalKey<FormState>();
 
   final dealerCompanyNameKey = TextEditingController();
+  final dealerCategoryKey = TextEditingController();
   final dealerBussinessHoursKey = TextEditingController();
   final dealerFirstNameKey = TextEditingController();
   final dealerLastNameKey = TextEditingController();
@@ -231,9 +234,10 @@ class _RegistrationState extends State<Registration> {
                           },
                         )),
                     Form(
-                        key: null,
+                        key: dealerCategoryValidationKey,
                         child: TextFormField(
                           style: TextStyle(color: themeData.textColor),
+                          controller: dealerCategoryKey,
                           decoration: InputDecoration(
                               hintText: 'Category ID',
                               hintStyle: TextStyle(color: themeData.textColor)),
@@ -447,7 +451,7 @@ class _RegistrationState extends State<Registration> {
                           var apiCommunicator = new apiCommunicator1("alabala");
                           String result = await apiCommunicator.registerDealer(
                             dealerCompanyNameKey.text,
-                            2,
+                            dealerCategoryKey.text,
                             dealerBussinessHoursKey.text,
                             dealerFirstNameKey.text,
                             dealerLastNameKey.text,
