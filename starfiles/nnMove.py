@@ -9,8 +9,10 @@ class NeuralNet:
     body = []
     
     #def __init__(self, inputsCount, n_hidden, outputsCount):
-    def __init__(self, body): 
-        self.body=[list(i) for i in body if type(i)==tuple]
+    def __init__(self, inputsCount, n_hidden, outputsCount): 
+        self.body=[[{'weights': [1.2570459230602489, 1.6298682614845794, 1.3282700470371336, 1.1520638530692278], 'output': 0.9999999993151563, 'delta': -1.716241903268027e-78}, {'weights': [-0.8716263648717071, 4.523010142874535, -6.666259261776005, -1.6786756066054753], 'output': 0.9995526092534923, 'delta': 4.8015418723116656e-73}, {'weights': [-0.7539189467165971, 4.587660268932683, -6.778074563099812, -1.8960754261893624], 'output': 0.9996137164252777, 'delta': 4.542618923945331e-73}],
+         [{'weights': [46.92413511228778, -20.104687623600967, -22.028104130306016, 46.80360158216826], 'output': 7.307946650044254e-36, 'delta': -5.3406084239893034e-71}, {'weights': [-45.097782223285925, 19.41841658117364, 21.215236846450235, -45.463625299688246], 'output': 1.0, 'delta': 0.0}]]
+        #print(self.body)
         #try:
         #    with open('neuralBody.json', 'r') as file:  
         #        new_body = json.load(file) 
@@ -72,7 +74,7 @@ class NeuralNet:
 
     # Update network weights with error
     def update_weights(self, row, learningRate):
-        print(type(self.body))
+        #print(type(self.body))
         for i in range(len(self.body)):
             inputs = row[:-1]
             if i != 0:
@@ -83,10 +85,11 @@ class NeuralNet:
                 neuron['weights'][-1] += learningRate * neuron['delta']
     def predict(self, row):
         outputs = self.forward_propagate(row)
+        #print(self.body)
         return outputs.index(max(outputs))
 
     # Train a network for a fixed number of epochs
-    def train(self, train, learningRate, epochCount, outputsCount=2):
+    def train(self, train, learningRate=0.5, epochCount=50, outputsCount=2):
         for epoch in range(epochCount):
             sum_error = 0
             for row in train:
@@ -96,7 +99,9 @@ class NeuralNet:
                 sum_error += sum([(expected[i]-outputs[i])**2 for i in range(len(expected))])
                 self.backward_propagate_error(expected)
                 self.update_weights(row, learningRate)
-            print('>epoch=%d, lrate=%.3f, error=%.3f' % (epoch, learningRate, sum_error))
+        print("trained body")
+        print(self.body)
+            #print('>epoch=%d, lrate=%.3f, error=%.3f' % (epoch, learningRate, sum_error))
         #payload=json.dumps({"body":self.body})
         #with open('neuralBody.json','w') as file:
         #   file.write(payload)

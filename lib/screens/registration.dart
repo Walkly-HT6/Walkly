@@ -34,23 +34,34 @@ class _RegistrationState extends State<Registration> {
   final userConfirmPasswordKey = TextEditingController();
 
   //DEALER
-  final dealerNameValidationKey = GlobalKey<FormState>();
-  final dealerLocationValidationKey = GlobalKey<FormState>();
+  final dealerCompanyNameValidationKey = GlobalKey<FormState>();
   final dealerBussinessHoursValidationKey = GlobalKey<FormState>();
-  final dealerDescribtionValidationKey = GlobalKey<FormState>();
-  ////TODO photos
+  final dealerFirstNameValidationKey = GlobalKey<FormState>();
+  final dealerLastNameValidationKey = GlobalKey<FormState>();
+  final dealerPhoneNumberValidationKey = GlobalKey<FormState>();
+  final dealerDescriptionValidationKey = GlobalKey<FormState>();
+  final dealerEmailValidationKey = GlobalKey<FormState>();
   final dealerPasswordValidationKey = GlobalKey<FormState>();
-  final dealerEmailNameValidationKey = GlobalKey<FormState>();
   final dealerConfirmPasswordValidationKey = GlobalKey<FormState>();
+  final dealerCityValidationKey = GlobalKey<FormState>();
+  final dealerStreetNameValidationKey = GlobalKey<FormState>();
+  final dealerPostCodeValidationKey = GlobalKey<FormState>();
+  final dealerBuiltNumberValidationKey = GlobalKey<FormState>();
 
-  final dealerNameKey = TextEditingController();
-  final dealerLocationKey = TextEditingController();
+  final dealerCompanyNameKey = TextEditingController();
   final dealerBussinessHoursKey = TextEditingController();
-  final dealerDescribtionKey = TextEditingController();
-  ////TODO photos
-  final dealerPasswordKey = TextEditingController();
+  final dealerFirstNameKey = TextEditingController();
+  final dealerLastNameKey = TextEditingController();
+  final dealerPhoneNumberKey = TextEditingController();
+  final dealerDescriptionKey = TextEditingController();
   final dealerEmailKey = TextEditingController();
+  final dealerPasswordKey = TextEditingController();
   final dealerConfirmPasswordKey = TextEditingController();
+  final dealerCityKey = TextEditingController();
+  final dealerStreetNameKey = TextEditingController();
+  final dealerPostCodeKey = TextEditingController();
+  final dealerBuiltNumberKey = TextEditingController();
+  ////TODO photos
 
   void initState() {
     super.initState();
@@ -173,7 +184,7 @@ class _RegistrationState extends State<Registration> {
                         userEmailKey.text,
                         userPasswordKey.text,
                       );
-                      /*if (result == "1") {
+                      if (result == "1") {
                         _scaffoldKeyReg.currentState.showSnackBar(SnackBar(
                           backgroundColor: Colors.green,
                           content: Text('Registration successful.'),
@@ -185,7 +196,7 @@ class _RegistrationState extends State<Registration> {
                           content: Text('Server host unreachable.'),
                           duration: Duration(seconds: 3),
                         ));
-                      }*/
+                      }
                     }
                   }))
         ]);
@@ -195,119 +206,276 @@ class _RegistrationState extends State<Registration> {
     Size size = MediaQuery.of(context).size;
     screenHeight = size.height;
     screenWidth = size.width;
-    return Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Form(
-              key: dealerNameValidationKey,
-              child: TextFormField(
-                style: TextStyle(color: themeData.textColor),
-                controller: dealerNameKey,
-                decoration: InputDecoration(
-                    hintText: 'Firm name',
-                    hintStyle: TextStyle(color: themeData.textColor)),
-                validator: (value) {
-                  if (value.length < 1) {
-                    return "Field required!";
-                  }
-                  return null;
-                },
-              )),
-          Form(
-              key: dealerLocationValidationKey,
-              child: TextFormField(
-                style: TextStyle(color: themeData.textColor),
-                controller: dealerLocationKey,
-                decoration: InputDecoration(
-                    hintText: 'Location',
-                    hintStyle: TextStyle(color: themeData.textColor)),
-                validator: (value) {
-                  if (value.length < 1) {
-                    return "Field required!";
-                  }
-                  return null;
-                },
-              )),
-          Form(
-              key: dealerBussinessHoursValidationKey,
-              child: TextFormField(
-                style: TextStyle(color: themeData.textColor),
-                controller: dealerBussinessHoursKey,
-                decoration: InputDecoration(
-                    hintText: 'Bussiness Hours',
-                    hintStyle: TextStyle(color: themeData.textColor)),
-                validator: (value) {
-                  if (value.length < 1) {
-                    return "Field required!";
-                  }
-                  return null;
-                },
-              )),
-          Form(
-              key: dealerDescribtionValidationKey,
-              child: TextFormField(
-                style: TextStyle(color: themeData.textColor),
-                controller: dealerDescribtionKey,
-                decoration: InputDecoration(
-                    hintText: 'Describtion',
-                    hintStyle: TextStyle(color: themeData.textColor)),
-                validator: (value) {
-                  if (value.length < 1) {
-                    return "Field required!";
-                  }
-                  return null;
-                },
-              )),
-          Form(
-              key: dealerPasswordValidationKey,
-              child: TextFormField(
-                style: TextStyle(color: themeData.textColor),
-                controller: dealerPasswordKey,
-                decoration: InputDecoration(
-                    hintText: 'Password',
-                    hintStyle: TextStyle(color: themeData.textColor)),
-                validator: (value) {
-                  if (value.length < 1) {
-                    return "Field required!";
-                  }
-                  return null;
-                },
-              )),
-          Form(
-              key: dealerConfirmPasswordValidationKey,
-              child: TextFormField(
-                style: TextStyle(color: themeData.textColor),
-                controller: dealerConfirmPasswordKey,
-                decoration: InputDecoration(
-                    hintText: 'Confirm Password',
-                    hintStyle: TextStyle(color: themeData.textColor)),
-                validator: (value) {
-                  if (value.length < 1) {
-                    return "Field required!";
-                  }
-                  return null;
-                },
-              )),
-          Divider(height: 30, color: themeData.firstLayerBoxColor),
-          ButtonTheme(
-              minWidth: screenWidth / 3.4,
-              child: RaisedButton(
-                  hoverColor: Color.fromRGBO(2, 139, 201, 1),
-                  color: themeData.canvasColor,
-                  child: Text(
-                    'REGISTER',
-                    style: TextStyle(
-                        color: themeData.firstLayerBoxColor,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  onPressed: () async {
-                    var answer = await Navigator.of(context).push(
-                        MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                Registration(themeData)));
-                  }))
-        ]);
+    return SizedBox(
+        height: screenHeight / 2,
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                  height: screenHeight / 2.6,
+                  child: ListView(children: [
+                    Form(
+                        key: dealerCompanyNameValidationKey,
+                        child: TextFormField(
+                          style: TextStyle(color: themeData.textColor),
+                          controller: dealerCompanyNameKey,
+                          decoration: InputDecoration(
+                              hintText: 'Company name',
+                              hintStyle: TextStyle(color: themeData.textColor)),
+                          validator: (value) {
+                            if (value.length < 1) {
+                              return "Field required!";
+                            }
+                            return null;
+                          },
+                        )),
+                    Form(
+                        key: null,
+                        child: TextFormField(
+                          style: TextStyle(color: themeData.textColor),
+                          decoration: InputDecoration(
+                              hintText: 'Category ID',
+                              hintStyle: TextStyle(color: themeData.textColor)),
+                          validator: (value) {
+                            if (value.length < 1) {
+                              return "Field required!";
+                            }
+                            return null;
+                          },
+                        )),
+                    Form(
+                        key: dealerBussinessHoursValidationKey,
+                        child: TextFormField(
+                          style: TextStyle(color: themeData.textColor),
+                          controller: dealerBussinessHoursKey,
+                          decoration: InputDecoration(
+                              hintText: 'Bussiness Hours',
+                              hintStyle: TextStyle(color: themeData.textColor)),
+                          validator: (value) {
+                            if (value.length < 1) {
+                              return "Field required!";
+                            }
+                            return null;
+                          },
+                        )),
+                    Form(
+                        key: dealerFirstNameValidationKey,
+                        child: TextFormField(
+                          style: TextStyle(color: themeData.textColor),
+                          controller: dealerFirstNameKey,
+                          decoration: InputDecoration(
+                              hintText: 'First Name',
+                              hintStyle: TextStyle(color: themeData.textColor)),
+                          validator: (value) {
+                            if (value.length < 1) {
+                              return "Field required!";
+                            }
+                            return null;
+                          },
+                        )),
+                    Form(
+                        key: dealerLastNameValidationKey,
+                        child: TextFormField(
+                          style: TextStyle(color: themeData.textColor),
+                          controller: dealerLastNameKey,
+                          decoration: InputDecoration(
+                              hintText: 'Last Name',
+                              hintStyle: TextStyle(color: themeData.textColor)),
+                          validator: (value) {
+                            if (value.length < 1) {
+                              return "Field required!";
+                            }
+                            return null;
+                          },
+                        )),
+                    Form(
+                        key: dealerPhoneNumberValidationKey,
+                        child: TextFormField(
+                          style: TextStyle(color: themeData.textColor),
+                          controller: dealerPhoneNumberKey,
+                          decoration: InputDecoration(
+                              hintText: 'Phone Number',
+                              hintStyle: TextStyle(color: themeData.textColor)),
+                          validator: (value) {
+                            if (value.length < 1) {
+                              return "Field required!";
+                            }
+                            return null;
+                          },
+                        )),
+                    Form(
+                        key: dealerDescriptionValidationKey,
+                        child: TextFormField(
+                          style: TextStyle(color: themeData.textColor),
+                          controller: dealerDescriptionKey,
+                          decoration: InputDecoration(
+                              hintText: 'Describtion',
+                              hintStyle: TextStyle(color: themeData.textColor)),
+                          validator: (value) {
+                            if (value.length < 1) {
+                              return "Field required!";
+                            }
+                            return null;
+                          },
+                        )),
+                    Form(
+                        key: dealerEmailValidationKey,
+                        child: TextFormField(
+                          style: TextStyle(color: themeData.textColor),
+                          controller: dealerEmailKey,
+                          decoration: InputDecoration(
+                              hintText: 'Email',
+                              hintStyle: TextStyle(color: themeData.textColor)),
+                          validator: (value) {
+                            if (value.length < 1) {
+                              return "Field required!";
+                            }
+                            return null;
+                          },
+                        )),
+                    Form(
+                        key: dealerPasswordValidationKey,
+                        child: TextFormField(
+                          style: TextStyle(color: themeData.textColor),
+                          controller: dealerPasswordKey,
+                          decoration: InputDecoration(
+                              hintText: 'Password',
+                              hintStyle: TextStyle(color: themeData.textColor)),
+                          validator: (value) {
+                            if (value.length < 1) {
+                              return "Field required!";
+                            }
+                            return null;
+                          },
+                        )),
+                    Form(
+                        key: dealerConfirmPasswordValidationKey,
+                        child: TextFormField(
+                          style: TextStyle(color: themeData.textColor),
+                          controller: dealerConfirmPasswordKey,
+                          decoration: InputDecoration(
+                              hintText: 'Confirm Password',
+                              hintStyle: TextStyle(color: themeData.textColor)),
+                          validator: (value) {
+                            if (value.length < 1) {
+                              return "Field required!";
+                            }
+                            return null;
+                          },
+                        )),
+                    Form(
+                        key: dealerCityValidationKey,
+                        child: TextFormField(
+                          style: TextStyle(color: themeData.textColor),
+                          controller: dealerCityKey,
+                          decoration: InputDecoration(
+                              hintText: 'City',
+                              hintStyle: TextStyle(color: themeData.textColor)),
+                          validator: (value) {
+                            if (value.length < 1) {
+                              return "Field required!";
+                            }
+                            return null;
+                          },
+                        )),
+                    Form(
+                        key: dealerStreetNameValidationKey,
+                        child: TextFormField(
+                          style: TextStyle(color: themeData.textColor),
+                          controller: dealerStreetNameKey,
+                          decoration: InputDecoration(
+                              hintText: 'Street',
+                              hintStyle: TextStyle(color: themeData.textColor)),
+                          validator: (value) {
+                            if (value.length < 1) {
+                              return "Field required!";
+                            }
+                            return null;
+                          },
+                        )),
+                    Form(
+                        key: dealerPostCodeValidationKey,
+                        child: TextFormField(
+                          style: TextStyle(color: themeData.textColor),
+                          controller: dealerPostCodeKey,
+                          decoration: InputDecoration(
+                              hintText: 'Postal Code',
+                              hintStyle: TextStyle(color: themeData.textColor)),
+                          validator: (value) {
+                            if (value.length < 1) {
+                              return "Field required!";
+                            }
+                            return null;
+                          },
+                        )),
+                    Form(
+                        key: dealerBuiltNumberValidationKey,
+                        child: TextFormField(
+                          style: TextStyle(color: themeData.textColor),
+                          controller: dealerBuiltNumberKey,
+                          decoration: InputDecoration(
+                              hintText: 'Built Number',
+                              hintStyle: TextStyle(color: themeData.textColor)),
+                          validator: (value) {
+                            if (value.length < 1) {
+                              return "Field required!";
+                            }
+                            return null;
+                          },
+                        )),
+                  ])),
+              Divider(height: 30, color: themeData.firstLayerBoxColor),
+              ButtonTheme(
+                  minWidth: screenWidth / 3.4,
+                  child: RaisedButton(
+                      hoverColor: Color.fromRGBO(2, 139, 201, 1),
+                      color: themeData.canvasColor,
+                      child: Text(
+                        'REGISTER',
+                        style: TextStyle(
+                            color: themeData.firstLayerBoxColor,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      onPressed: () async {
+                        if (dealerFirstNameValidationKey.currentState
+                                .validate() &&
+                            dealerPasswordValidationKey.currentState
+                                .validate() &&
+                            dealerPasswordKey.text ==
+                                dealerConfirmPasswordKey.text) {
+                          var apiCommunicator = new apiCommunicator1("alabala");
+                          String result = await apiCommunicator.registerDealer(
+                            dealerCompanyNameKey.text,
+                            2,
+                            dealerBussinessHoursKey.text,
+                            dealerFirstNameKey.text,
+                            dealerLastNameKey.text,
+                            dealerPhoneNumberKey.text,
+                            dealerDescriptionKey.text,
+                            dealerEmailKey.text,
+                            dealerPasswordKey.text,
+                            dealerCityKey.text,
+                            dealerStreetNameKey.text,
+                            dealerPostCodeKey.text,
+                            dealerBuiltNumberKey.text,
+                          );
+                          if (result == "1") {
+                            _scaffoldKeyReg.currentState.showSnackBar(SnackBar(
+                              backgroundColor: Colors.green,
+                              content: Text('Registration successful.'),
+                              duration: Duration(seconds: 3),
+                            ));
+                          } else {
+                            _scaffoldKeyReg.currentState.showSnackBar(SnackBar(
+                              backgroundColor: Colors.red,
+                              content: Text('Server host unreachable.'),
+                              duration: Duration(seconds: 3),
+                            ));
+                          }
+                        }
+                      }))
+            ]));
   }
 
   Widget prepare() {
