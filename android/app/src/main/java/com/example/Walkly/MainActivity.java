@@ -28,6 +28,7 @@ import java.util.Map;
 public class MainActivity extends FlutterActivity {
     private static final String CHANNEL = "walkly/native";
     private String cookie_test = "";
+    JSONObject getOffers;
 
     @Override
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
@@ -45,8 +46,9 @@ public class MainActivity extends FlutterActivity {
                         result.success("1");
                     }
                     if (call.method.equals("getOffers")) {
-                        JSONObject jsonObject = getOffers();
-                        result.success(jsonObject);
+                        //JSONObject jsonObject = getOffers();
+                        {getOffers();}
+                        result.success(getOffers);
                     }
                     if (call.method.equals("makeOffer")) {
                         final String date_from_to = call.argument("date_from_to");
@@ -137,14 +139,14 @@ public class MainActivity extends FlutterActivity {
 
         }
 
-        private JSONObject getOffers() {
+        private void getOffers() {
             final String url = "http://192.168.1.9/walklyapp/get_offers.php";
-            final JSONObject[] jsonObject = new JSONObject[1];
             JsonObjectRequest getRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                     new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
-                            jsonObject[0] = response;
+                            //jsonObject[0] = response;
+                            getOffers = response;
 
                             //Log.d("Response", response.toString());
                         }
@@ -158,7 +160,7 @@ public class MainActivity extends FlutterActivity {
 
             RequestQueue requestQueue = Volley.newRequestQueue(this);
             requestQueue.add(getRequest);
-            return jsonObject[0];
+            //return jsonObject[0];
         }
 
         private void makeOffer(final String date_from_to, final String coupon_count,
