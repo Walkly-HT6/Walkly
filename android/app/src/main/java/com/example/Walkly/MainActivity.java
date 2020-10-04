@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+=======
+package com.angelstoyanov.walkly;
+
+>>>>>>> f2ccb755e778709fb208f71521c0d590c625fc13
 import io.flutter.embedding.android.FlutterActivity;
 
 import androidx.annotation.NonNull;
@@ -403,4 +408,8 @@ public class MainActivity extends FlutterActivity {
         requestQueue.add(stringRequest);
     }
 
+<<<<<<< HEAD
     }
+=======
+    }
+>>>>>>> f2ccb755e778709fb208f71521c0d590c625fc13
