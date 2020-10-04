@@ -290,25 +290,16 @@ public class MainActivity extends FlutterActivity {
             StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    cookie_test = response;
-                    Log.d("RESPONSE: ", "TESTESTFefef"); //TESTESTFefef
-                    Log.d("RESPONSE: ", response.length() + ""); //20
-                    Log.d("RESPONSE: ", response); //randaof
-
                     if ( (response.length() + "").equals("20") ) { //The cookie is always 20 symbols
                         cookie_test = response;
-                        Log.d("TEST", "aseefffefef");
-                        Log.d("Cookie", "tetststst");
                     }
                     if(response.equals("Error")){
-                        //result.error("1","Error","-");
                     }
 
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError e) {
-                    // result.error("0");
                 }
             }) {
                 @Override
@@ -322,8 +313,6 @@ public class MainActivity extends FlutterActivity {
 
             RequestQueue requestQueue = Volley.newRequestQueue(this);
             requestQueue.add(stringRequest);
-            //Log.d("Cookie", cookie[0]);
-            //return cookie[0];
         }
 
     }
