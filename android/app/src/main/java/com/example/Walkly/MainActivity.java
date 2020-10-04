@@ -49,11 +49,11 @@ public class MainActivity extends FlutterActivity {
                     }
                     if (call.method.equals("makeOffer")) {
                         final String date_from_to = call.argument("date_from_to");
-                        final int coupon_count = call.argument("coupon_count");
-                        final int business_user_id = call.argument("business_user_id");
+                        final String coupon_count = call.argument("coupon_count");
+                        final String business_user_id = call.argument("business_user_id");
                         final String description = call.argument("description");
-                        final float price = call.argument("price");
-                        makeOffer(date_from_to,coupon_count,business_user_id,description,price);
+                        final String points = call.argument("points");
+                        makeOffer(date_from_to,coupon_count,business_user_id,description,points);
                         result.success("1");
                     }
                     if (call.method.equals("registerDealer")) {
@@ -86,7 +86,7 @@ public class MainActivity extends FlutterActivity {
 
                         final String url = "http://192.168.1.9/walklyapp/login.php";
                         final String[] cookie = new String[1];
-                        cookie[1] = ""; //empty at start
+                        cookie[0] = ""; //empty at start
                         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                             @Override
                             public void onResponse(String response) {
@@ -94,6 +94,9 @@ public class MainActivity extends FlutterActivity {
                                 if (response.length() == 20) { //The cookie is always 20 symbols
                                     cookie[0] = response;
                                     result.success(cookie[0]);
+                                }
+                                if(response.equals("Error")){
+                                    result.error("1","Error","-");
                                 }
 
                             }
@@ -188,8 +191,8 @@ public class MainActivity extends FlutterActivity {
             return jsonObject[0];
         }
 
-        private void makeOffer(final String date_from_to, final int coupon_count,
-        final int business_user_id, final String description, final float price) {
+        private void makeOffer(final String date_from_to, final String coupon_count,
+        final String business_user_id, final String description, final String points) {
             final String url = "http://192.168.1.9/walklyapp/make_offer.php";
             StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
                 @Override
@@ -211,10 +214,10 @@ public class MainActivity extends FlutterActivity {
                 protected Map<String, String> getParams() {
                     Map<String, String> params = new HashMap<>();
                     params.put("date_from_to", date_from_to);
-                    params.put("coupon_count", coupon_count + "");
-                    params.put("business_user_id", business_user_id + "");
+                    params.put("coupon_count", coupon_count);
+                    params.put("business_user_id", business_user_id);
                     params.put("description", description);
-                    params.put("price", price + "");
+                    params.put("points", points);
                     return params;
                 }
             };
